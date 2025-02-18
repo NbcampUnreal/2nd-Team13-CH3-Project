@@ -1,25 +1,25 @@
 
-Binaries/
-Build/
-DerivedDataCache/
-Intermediate/
-Saved/
+Shadow_of_the_Desert/Binaries/
+Shadow_of_the_Desert/Build/
+Shadow_of_the_Desert/DerivedDataCache/
+Shadow_of_the_Desert/Intermediate/
+Shadow_of_the_Desert/Saved/
 
-*.sln
-*.suo
-*.xcodeproj
-*.xcworkspace
-*.VC.db
-*.VC.VC.opendb
+Shadow_of_the_Desert/*.sln
+Shadow_of_the_Desert/*.suo
+Shadow_of_the_Desert/*.xcodeproj
+Shadow_of_the_Desert/*.xcworkspace
+Shadow_of_the_Desert/*.VC.db
+Shadow_of_the_Desert/*.VC.VC.opendb
 
-*.log
-*.tmp
+Shadow_of_the_Desert/*.log
+Shadow_of_the_Desert/*.tmp
 
-.DS_Store
+Shadow_of_the_Desert/*/.DS_Store
 
-.vscode/
-.idea/
+Shadow_of_the_Desert/*/.vscode/
+Shadow_of_the_Desert/*/.idea/
 
 # Visual Studio cache
-.vs/
-*.ipch
+Shadow_of_the_Desert/*/.vs/
+Shadow_of_the_Desert/*.ipch
