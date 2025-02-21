@@ -50,18 +50,43 @@ public:
 
 protected:
 
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Health")
+	float MaxHealth;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Health")
+	float Health;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Defensive")
+	float MaxDefensive;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Defensive")
+	float Defensive;
+
 	/** Called for movement input */
+	UFUNCTION()
 	void Move(const FInputActionValue& Value);
 
 	/** Called for looking input */
+	UFUNCTION()
 	void Look(const FInputActionValue& Value);
-			
 
-protected:
+	virtual float TakeDamage(float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		AController* EventInstigator,
+		AActor* DamageCauser) override; 
+	UFUNCTION()
+	void StartJump(const FInputActionValue& value);
+	UFUNCTION()
+	void StopJump(const FInputActionValue& value);
+
+
+	void UpdateOverheadHP();
 
 	virtual void NotifyControllerChanged() override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+private:
+	float Speed;
+	float SprintSpeedMultiplier;
+	float SprintSpeed;
 
 public:
 	/** Returns CameraBoom subobject **/
