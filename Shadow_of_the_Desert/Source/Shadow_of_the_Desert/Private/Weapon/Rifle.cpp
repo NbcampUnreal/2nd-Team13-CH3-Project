@@ -38,10 +38,13 @@ void ARifle::CompleteReload()
 
 void ARifle::Attack()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Attack Plz."));
+
 	float CurrentTime = GetWorld()->GetTimeSeconds();
 
 	if (CurrentAmmo > 0 && !bIsReloading && (CurrentTime - LastAttackTime >= AttackRate))
 	{
+
 		FRotator CameraRotation;
 		FVector WeaponLocation = GetActorLocation() + CameraRotation.Vector() * 100.0f;
 		//³­¼ö(ÃÑ¾Ë Æ¢´Â°Å)
@@ -54,10 +57,11 @@ void ARifle::Attack()
 		{
 			Bullet->Initialize(Direction, AttackDamage);
 		}   
+		UE_LOG(LogTemp, Warning, TEXT("Good! Ammo %d"), CurrentAmmo);
 		CurrentAmmo--;
 		LastAttackTime = CurrentTime;
 	}
-	else
+	if(CurrentAmmo <= 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Reloading Plz."));
 	}
