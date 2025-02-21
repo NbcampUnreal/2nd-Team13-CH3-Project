@@ -25,6 +25,7 @@ protected:
 	UBoxComponent* SpawningBox;
 
 	FVector GetRandomPointInVolume() const;
+	void EnemySpawn();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
