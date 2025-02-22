@@ -24,6 +24,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning")
 	UBoxComponent* SpawningBox;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+	float AvoidanceRadius = 300.0f;	// 플레이어와 몬스터 스폰지점 사이 최소거리
+
 	FVector GetRandomPointInVolume() const;
 	void EnemySpawn();
 

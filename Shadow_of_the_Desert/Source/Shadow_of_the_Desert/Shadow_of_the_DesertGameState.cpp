@@ -3,6 +3,7 @@
 
 #include "Shadow_of_the_DesertGameState.h"
 #include "Shadow_of_the_DesertGameInstance.h"
+#include "Blueprint/UserWidget.h"
 
 AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 {
@@ -69,6 +70,10 @@ void AShadow_of_the_DesertGameState::EnemySpawn()
 
 void AShadow_of_the_DesertGameState::UpdateHUD()
 {
+	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+	{
+
+	}
 	// 여기 UI HUD 작성 코드
 }
 
