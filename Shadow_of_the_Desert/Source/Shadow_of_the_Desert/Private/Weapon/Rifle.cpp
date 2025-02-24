@@ -32,34 +32,52 @@ void ARifle::Reload()
 void ARifle::CompleteReload()
 {
 	CurrentAmmo = MaxAmmo;
-	UE_LOG(LogTemp, Warning, TEXT("Reloading complete."));
 	bIsReloading = false;
+	UE_LOG(LogTemp, Warning, TEXT("Reload Complete! CurrentAmmo: %d, bIsReloading: %s, LastAttackTime: %f"),
+		CurrentAmmo, bIsReloading ? TEXT("true") : TEXT("false"),
+		LastAttackTime);
 }
 
 void ARifle::Attack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Attack Plz."));
-
+	UE_LOG(LogTemp, Warning, TEXT("CurrentAmmo: %d, bIsReloading: %s, LastAttackTime: %f"),
+		CurrentAmmo, bIsReloading ? TEXT("true") : TEXT("false"),
+		LastAttackTime);
+	if (bIsReloading)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("rerererere"))
+	}
 	float CurrentTime = GetWorld()->GetTimeSeconds();
 
 	if (CurrentAmmo > 0 && !bIsReloading && (CurrentTime - LastAttackTime >= AttackRate))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Shot"));
 
 		FRotator CameraRotation;
-		FVector WeaponLocation = GetActorLocation() + CameraRotation.Vector() * 100.0f;
-		//³­¼ö(ÃÑ¾Ë Æ¢´Â°Å)
-		float RandomOffsetX = FMath::FRandRange(-0.1f, 0.1f);
-		float RandomOffsetY = FMath::FRandRange(-0.1f, 0.1f);
-		FVector Direction = (CameraRotation.Vector() + FVector(RandomOffsetX, RandomOffsetY, 0)).GetSafeNormal();
+		FVector CameraLocation;
 
-		ABulletBase* Bullet = GetWorld()->SpawnActor<ABulletBase>(BulletClass, WeaponLocation, FRotator::ZeroRotator);
-		if (Bullet)
+
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		if (PlayerController)
 		{
-			Bullet->Initialize(Direction, AttackDamage);
-		}   
-		UE_LOG(LogTemp, Warning, TEXT("Good! Ammo %d"), CurrentAmmo);
-		CurrentAmmo--;
-		LastAttackTime = CurrentTime;
+			PlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
+			FVector WeaponLocation = GetActorLocation() + CameraRotation.Vector() * 100.0f;//ÃÑ¾Ë ¹ß»ç À§Ä¡
+			//³­¼ö(ÃÑ¾Ë Æ¢´Â°Å)
+			float RandomOffsetX = FMath::FRandRange(-0.1f, 0.1f);
+			float RandomOffsetY = FMath::FRandRange(-0.1f, 0.1f);
+			FVector Direction = (CameraRotation.Vector() + FVector(RandomOffsetX, RandomOffsetY, 0)).GetSafeNormal();
+
+			ABulletBase* Bullet = GetWorld()->SpawnActor<ABulletBase>(BulletClass, WeaponLocation, FRotator::ZeroRotator);
+			if (Bullet)
+			{
+				Bullet->Initialize(Direction, AttackDamage);
+			}
+			CurrentAmmo--;
+			UE_LOG(LogTemp, Warning, TEXT("END CurrentAmmo: %d, bIsReloading: %s, LastAttackTime: %f"),
+				CurrentAmmo, bIsReloading ? TEXT("true") : TEXT("false"),
+				LastAttackTime);
+			LastAttackTime = CurrentTime;
+		}
 	}
 	if(CurrentAmmo <= 0)
 	{
