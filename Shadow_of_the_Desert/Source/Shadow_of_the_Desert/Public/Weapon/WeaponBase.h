@@ -12,6 +12,14 @@ class SHADOW_OF_THE_DESERT_API AWeaponBase : public AActor
 	
 public:
     AWeaponBase();
+    
+	virtual void Reload();
+    virtual void CompleteReload();
+    virtual void Attack();
+protected:
+    UPROPERTY(VisibleAnywhere)
+    UStaticMeshComponent* WeaponMesh;
+
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     float AttackDamage;
     UPROPERTY(VisibleAnywhere, Category = "Weapon")
@@ -25,11 +33,6 @@ public:
     float LastAttackTime;
     UPROPERTY(EditDefaultsOnly, Category = "Weapon")
     TSubclassOf<ABulletBase> BulletClass; // 발사할 총알의 클래스 타입
-    
-	virtual void Reload();
-    virtual void CompleteReload();
-    virtual void Attack();
-protected:
-    UPROPERTY(VisibleAnywhere)
-    UStaticMeshComponent* WeaponMesh;
+
+
 };

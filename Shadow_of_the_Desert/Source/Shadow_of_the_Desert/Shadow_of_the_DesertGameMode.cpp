@@ -2,6 +2,7 @@
 
 #include "Shadow_of_the_DesertGameMode.h"
 #include "Shadow_of_the_DesertCharacter.h"
+#include "Shadow_of_the_DesertGameState.h"
 #include "UObject/ConstructorHelpers.h"
 
 AShadow_of_the_DesertGameMode::AShadow_of_the_DesertGameMode()
@@ -12,4 +13,7 @@ AShadow_of_the_DesertGameMode::AShadow_of_the_DesertGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	// GameState ¼³Á¤
+	GameStateClass = AShadow_of_the_DesertGameState::StaticClass();
 }
