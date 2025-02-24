@@ -50,15 +50,6 @@ AShadow_of_the_DesertCharacter::AShadow_of_the_DesertCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	Speed = 600.0f;
-	SprintSpeedMultiplier = 1.7f;
-	SprintSpeed = Speed * SprintSpeedMultiplier;
-
-	GetCharacterMovement()->MaxWalkSpeed = Speed;
-
-	MaxHealth = 100.0f;
-	Health = MaxHealth;
-
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -134,21 +125,5 @@ void AShadow_of_the_DesertCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
-	}
-}
-
-void AShadow_of_the_DesertCharacter::StartJump(const FInputActionValue& value)
-{
-	if (value.Get<bool>())
-	{
-		Jump();
-	}
-}
-
-void AShadow_of_the_DesertCharacter::StopJump(const FInputActionValue& value)
-{
-	if (!value.Get<bool>())
-	{
-		StopJumping();
 	}
 }
