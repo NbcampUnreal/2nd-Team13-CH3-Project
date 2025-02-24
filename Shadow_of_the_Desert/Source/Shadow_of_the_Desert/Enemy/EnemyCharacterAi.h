@@ -15,6 +15,6 @@ public:
 	// Sets default values for this character's properties
 	AEnemyCharacterAi();
 
-//	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Enemy")
-//	TArray<AActor*> patrolPoints;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
+	float groundSpeedF;
 };
