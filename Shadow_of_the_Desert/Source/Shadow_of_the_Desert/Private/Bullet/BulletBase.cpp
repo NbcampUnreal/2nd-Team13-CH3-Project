@@ -1,5 +1,6 @@
 #include "Bullet/BulletBase.h"
 #include "Components/StaticMeshComponent.h"
+//#include "EnemyCharater.h"
 
 ABulletBase::ABulletBase()
 {
@@ -33,7 +34,7 @@ void ABulletBase::Initialize(FVector Direction, float Damage)
 	BulletDamage = Damage;
 }
 
+//적이나 구조물 중 하나에 부딪히면 사라짐
 void ABulletBase::OnHit(AActor* OtherActor)
 {
-
 }
