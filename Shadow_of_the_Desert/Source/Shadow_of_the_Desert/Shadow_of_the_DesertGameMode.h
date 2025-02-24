@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameMode.h"
+#include "GameFramework/GameModeBase.h"
 #include "Shadow_of_the_DesertGameMode.generated.h"
 
 UCLASS(minimalapi)
-class AShadow_of_the_DesertGameMode : public AGameMode
+class AShadow_of_the_DesertGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
