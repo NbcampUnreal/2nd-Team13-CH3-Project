@@ -10,5 +10,4 @@ AEnemyCharacterAi::AEnemyCharacterAi()
  	
 	AIControllerClass = AEnemyAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-	groundSpeedF = 0.0f;
 }
