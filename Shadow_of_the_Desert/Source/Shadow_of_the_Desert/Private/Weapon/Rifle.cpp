@@ -61,7 +61,7 @@ void ARifle::Attack()
 		if (PlayerController)
 		{
 			PlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
-			FVector WeaponLocation = GetActorLocation() + CameraRotation.Vector() * 100.0f;//ÃÑ¾Ë ¹ß»ç À§Ä¡
+			FVector WeaponLocation = GetActorLocation() + CameraRotation.Vector() * 300.0f;//ÃÑ¾Ë ¹ß»ç À§Ä¡
 			//³­¼ö(ÃÑ¾Ë Æ¢´Â°Å)
 			float RandomOffsetX = FMath::FRandRange(-0.1f, 0.1f);
 			float RandomOffsetY = FMath::FRandRange(-0.1f, 0.1f);
