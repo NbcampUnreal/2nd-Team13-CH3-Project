@@ -4,6 +4,7 @@
 #include "Shadow_of_the_DesertGameState.h"
 #include "Shadow_of_the_DesertGameInstance.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/TextBlock.h"
 
 AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 {
@@ -14,8 +15,20 @@ AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 	bIsBossSpawned = false;
 	bIsBossDead = false;
 	bIsPlayerDead = false;
+	bIsTimerRunning = false;
 }
 
+
+void AShadow_of_the_DesertGameState::StartGameTimer()
+{
+	if (!bIsTimerRunning)
+	{
+		bIsTimerRunning = true;
+
+		// 1초마다 UpdateTimer 함수 실행
+		//GetWorldTimerManager().SetTimer(GameTimerHandle, this, &AShadow_of_the_DesertGameState::UpdateHUD, 1.0f, true);
+	}
+}
 
 void AShadow_of_the_DesertGameState::SpawnBoss()
 {
@@ -70,22 +83,40 @@ void AShadow_of_the_DesertGameState::EnemySpawn()
 
 void AShadow_of_the_DesertGameState::UpdateHUD()
 {
-	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
-	{
+	/*float LocalElapsedTime = GetWorld()->GetTimeSeconds();
+	UE_LOG(LogTemp, Warning, TEXT("Elapsed Time: %.2f seconds"), LocalElapsedTime);*/
 
-	}
-	// 여기 UI HUD 작성 코드
+	/*float LocalElapsedTime = GetWorldTimerManager().GetTimerElapsed(GameTimerHandle);
+	UE_LOG(LogTemp, Warning, TEXT("Elapsed Time: %.1f"), LocalElapsedTime);*/
+
+
+	/*if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+	{
+		APlayer_Controller Player_Controller = Cast<APlayer_Controller>(PlayerController);
+		if (UUserWidget* HUDWidget = Player_Controller->GetHUDWidget())
+		{
+			if (UTextBlock* TimeText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("시간"))))
+			{
+				float ElapsedTime = GetWorldTimerManager().GetTimerElapsed(GameTimerHandle);
+
+				TimeText->SetText(FText::FromString(FString::Printf(TEXT("Elapsed Time: %.1f"), ElapsedTime)));
+			}
+		}
+	}*/
 }
 
 void AShadow_of_the_DesertGameState::GameEnd()
 {
 	GetWorldTimerManager().ClearTimer(HUDUpdateTimerHandle);
+	GetWorldTimerManager().ClearTimer(GameTimerHandle);
 	// 여기 게임 종료 코드 메뉴창 호출
 }
 
 void AShadow_of_the_DesertGameState::BeginPlay()
 {
 	Super::BeginPlay();
+
+	StartGameTimer();
 
 	//첫스폰
 	EnemySpawn();
@@ -101,6 +132,6 @@ void AShadow_of_the_DesertGameState::BeginPlay()
 		HUDUpdateTimerHandle,
 		this,
 		&AShadow_of_the_DesertGameState::UpdateHUD,
-		0.1f,
+		1.0f,
 		false);
 }
