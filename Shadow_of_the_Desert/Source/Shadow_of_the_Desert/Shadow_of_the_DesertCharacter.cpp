@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Player_Controller.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -22,9 +23,11 @@ AShadow_of_the_DesertCharacter::AShadow_of_the_DesertCharacter()
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 		
 	// Don't rotate when the controller rotates. Let that just affect the camera.
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
+	//bUseControllerRotationPitch = false;
+	//bUseControllerRotationYaw = false;
+	//bUseControllerRotationRoll = false;
+
+	PrimaryActorTick.bCanEverTick = false;
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
@@ -71,29 +74,44 @@ void AShadow_of_the_DesertCharacter::NotifyControllerChanged()
 	Super::NotifyControllerChanged();
 
 	// Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (APlayer_Controller* PlayerController = Cast<APlayer_Controller>(Controller))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			Subsystem->AddMappingContext(PlayerController->InPutMappingContext, 0);
 		}
 	}
 }
 
 void AShadow_of_the_DesertCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
-		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
-		// Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Move);
-
-		// Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Look);
+		if (APlayer_Controller* PlayerController = Cast<APlayer_Controller>(GetController())) {
+			if (PlayerController->MoveAction)
+			{
+				EnhancedInputComponent->BindAction(PlayerController->MoveAction, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Move);
+				UE_LOG(LogTemp, Warning, TEXT("Im Move"));
+			}
+			if (PlayerController->LookAciton)
+			{
+				EnhancedInputComponent->BindAction(PlayerController->LookAciton, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Look);
+				UE_LOG(LogTemp, Warning, TEXT("Im Look"));
+			}
+			if (PlayerController->JumpAciton)
+			{
+				EnhancedInputComponent->BindAction(PlayerController->JumpAciton, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::StartJump);
+				EnhancedInputComponent->BindAction(PlayerController->MoveAction, ETriggerEvent::Completed, this, &AShadow_of_the_DesertCharacter::StopJump);
+				UE_LOG(LogTemp, Warning, TEXT("Im Jump"));
+			}
+			if (PlayerController->SprintAction)
+			{
+				EnhancedInputComponent->BindAction(PlayerController->SprintAction, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::StartSprint);
+				EnhancedInputComponent->BindAction(PlayerController->SprintAction, ETriggerEvent::Completed, this, &AShadow_of_the_DesertCharacter::StopSprint);
+				UE_LOG(LogTemp, Warning, TEXT("Im Sprint"));
+			}
+		}
 	}
 	else
 	{
@@ -104,23 +122,18 @@ void AShadow_of_the_DesertCharacter::SetupPlayerInputComponent(UInputComponent* 
 void AShadow_of_the_DesertCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (Controller != nullptr)
+	if (!Controller) return;
+	const FVector2D MovementVector = Value.Get<FVector2D>();
+
+	if (!FMath::IsNearlyZero(MovementVector.X))
 	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		AddMovementInput(GetActorForwardVector(), MovementVector.X);
+	}
 
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
+	if (!FMath::IsNearlyZero(MovementVector.Y))
+	{
+		AddMovementInput(GetActorRightVector(), MovementVector.Y);
 	}
 }
 
@@ -150,5 +163,20 @@ void AShadow_of_the_DesertCharacter::StopJump(const FInputActionValue& value)
 	if (!value.Get<bool>())
 	{
 		StopJumping();
+	}
+}
+
+void AShadow_of_the_DesertCharacter::StartSprint(const FInputActionValue& value) 
+{
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	}
+}
+void AShadow_of_the_DesertCharacter::StopSprint(const FInputActionValue& value)
+{
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->MaxWalkSpeed = Speed;
 	}
 }

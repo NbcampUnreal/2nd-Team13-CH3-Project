@@ -13,7 +13,8 @@ AShadow_of_the_DesertGameMode::AShadow_of_the_DesertGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
-
+	//캐릭터 컨트롤러 설정
+	PlayerControllerClass = AShadow_of_the_DesertCharacter::StaticClass();
 	// GameState 설정
 	GameStateClass = AShadow_of_the_DesertGameState::StaticClass();
 }
