@@ -17,8 +17,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Explosion")
 	float ExplosionRadius; // Æø¹ß ¹üÀ§
 
+	void BeginPlay() override;
 	UFUNCTION()
 	void Explode(FVector Location);
 
-	virtual void OnHit(AActor* OtherActor) override;
+	
+	virtual void OnHit(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult
+	) override;
 };
