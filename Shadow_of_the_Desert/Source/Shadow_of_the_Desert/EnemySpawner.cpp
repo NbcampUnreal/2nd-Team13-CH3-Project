@@ -17,7 +17,6 @@ AEnemySpawner::AEnemySpawner()
 
 	SpawningBox = CreateDefaultSubobject<UBoxComponent>(TEXT("SpawningBox"));
 	SpawningBox->SetupAttachment(Scene);
-
 }
 
 FVector AEnemySpawner::GetRandomPointInVolume() const
@@ -37,7 +36,9 @@ void AEnemySpawner::EnemySpawn()
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Player"), FoundActors);
 
-	const float AvoidanceRadius = 300.0f;
+	TArray<AActor*> ObstacleActors;
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName("Obstacle"), ObstacleActors);
+	
 	bool bValidLocation = false;
 	FVector SpawnLocation;
 
@@ -55,13 +56,34 @@ void AEnemySpawner::EnemySpawn()
 				if (Distance < AvoidanceRadius)
 				{
 					bValidLocation = false;
-					// 여기 아래에 몬스터 스폰 코드 추가 or 몬스터 생성 함수
+					break; // 가까이에 플레이어가 있으면 다시 좌표 생성
+				}
+			}
+		}
 
-					break; // 가까운 플레이어가 있으면 다시 좌표 생성
+		// Obstacle 내부에 스폰되지 않도록 확인
+		if (bValidLocation) // 플레이어 근처가 아닌 경우에만 추가 검사
+		{
+			for (AActor* Obstacle : ObstacleActors)
+			{
+				if (Obstacle)
+				{
+					// Obstacle의 경계 박스(Bounding Box) 가져오기
+					FBox ObstacleBounds = Obstacle->GetComponentsBoundingBox();
+
+					// 스폰 위치가 Obstacle의 내부에 있는지 확인
+					if (ObstacleBounds.IsInside(SpawnLocation))
+					{
+						bValidLocation = false; // Obstacle 내부라면 다시 찾기
+						break;
+					}
 				}
 			}
 		}
 	}
+	// 여기 아래에 몬스터 스폰 코드 추가 or 몬스터 생성 함수
+	// 디버그용으로 스폰 위치를 화면에 표시 (5초간 유지, 녹색)
+	DrawDebugSphere(GetWorld(), SpawnLocation, 20.0f, 12, FColor::Green, false, 60.0f);
 }
 
 // Called when the game starts or when spawned
@@ -69,6 +91,10 @@ void AEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	for (size_t i = 0; i < 50; i++)
+	{
+		EnemySpawn();
+	}
 }
 
 // Called every frame

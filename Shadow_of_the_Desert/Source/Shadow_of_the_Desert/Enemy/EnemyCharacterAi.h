@@ -14,7 +14,4 @@ class SHADOW_OF_THE_DESERT_API AEnemyCharacterAi : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AEnemyCharacterAi();
-
-//	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Enemy")
-//	TArray<AActor*> patrolPoints;
 };
