@@ -2,15 +2,15 @@
 
 #include "CoreMinimal.h"
 #include "Weapon/WeaponBase.h"
-#include "Rifle.generated.h"
+#include "Sniper.generated.h"
 
 
 UCLASS()
-class SHADOW_OF_THE_DESERT_API ARifle : public AWeaponBase
+class SHADOW_OF_THE_DESERT_API ASniper : public AWeaponBase
 {
 	GENERATED_BODY()
 public:
-	ARifle();
+	ASniper();
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	virtual void Reload()override;
 
@@ -19,10 +19,4 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	virtual void Attack()override;
-
-	virtual void UpgradeAttackDamage()override;
-	virtual void UpgradeAttackRate()override;
-	virtual void UpgradeMaxAmmo()override;
-	virtual void UpgradeReloadTime()override;
-
 };

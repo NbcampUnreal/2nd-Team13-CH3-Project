@@ -23,6 +23,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Enemy")
 	int32 AllEnemyCount;
 
+	// 게임이 일시정지 상태인지 여부
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Time")
+	bool bIsPaused;
 
 	// 적 스폰 양
 	int32 MinSpawnNum;
@@ -31,21 +34,33 @@ public:
 	// 보스, 플레이어 사망 여부
 	bool bIsBossDead;
 	bool bIsPlayerDead;
+	
 
-	UPROPERTY(BlueprintReadOnly, Category = "GameTimer")
 	FTimerHandle GameTimerHandle;
 	
 	FTimerHandle EnemyTimerHandle;
 	FTimerHandle HUDUpdateTimerHandle;
 
-	UFUNCTION(BlueprintCallable, Category = "GameTimer")
-	void StartGameTimer();
+	float LocalElapsedTime;
+
+	UFUNCTION(BlueprintCallable, Category = "Menu")
+	void LocalStartGame();
+
+	// 게임 일시정지 처리
+	UFUNCTION(BlueprintCallable, Category = "GameFlow")
+	void LocalPauseGame();
+
+	// 게임 재개 처리
+	UFUNCTION(BlueprintCallable, Category = "GameFlow")
+	void LocalResumeGame();
 
 	void SpawnBoss();
 	void KillEnemy();
 	void EnemySpawn();
+	void TimerUpdate();
 	void UpdateHUD();
 	void GameEnd();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
