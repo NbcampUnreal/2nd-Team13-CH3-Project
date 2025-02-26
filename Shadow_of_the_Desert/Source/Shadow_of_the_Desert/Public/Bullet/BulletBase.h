@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/SphereComponent.h"
 #include "BulletBase.generated.h"
 
 UCLASS()
@@ -19,6 +20,17 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void Initialize(FVector Direction, float Damage);
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	virtual void OnHit(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult
+	);
+
 protected:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* BulletMesh;
@@ -29,5 +41,6 @@ protected:
 	FVector MovementDirection;
 	float BulletDamage;
 
-	virtual void OnHit(AActor* OtherActor);
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* ExplosionCollision;
 };
