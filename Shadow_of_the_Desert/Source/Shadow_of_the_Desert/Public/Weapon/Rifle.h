@@ -24,5 +24,7 @@ public:
 	virtual void UpgradeAttackRate()override;
 	virtual void UpgradeMaxAmmo()override;
 	virtual void UpgradeReloadTime()override;
-
+protected:
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* AmmoMesh;
 };
