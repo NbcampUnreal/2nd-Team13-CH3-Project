@@ -23,6 +23,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Enemy")
 	int32 AllEnemyCount;
 
+
 	// 적 스폰 양
 	int32 MinSpawnNum;
 	int32 MaxSpawnNum;
@@ -31,8 +32,14 @@ public:
 	bool bIsBossDead;
 	bool bIsPlayerDead;
 
+	UPROPERTY(BlueprintReadOnly, Category = "GameTimer")
+	FTimerHandle GameTimerHandle;
+	
 	FTimerHandle EnemyTimerHandle;
 	FTimerHandle HUDUpdateTimerHandle;
+
+	UFUNCTION(BlueprintCallable, Category = "GameTimer")
+	void StartGameTimer();
 
 	void SpawnBoss();
 	void KillEnemy();
@@ -46,4 +53,5 @@ protected:
 private:
 	// 보스 스폰 여부
 	bool bIsBossSpawned;
+	bool bIsTimerRunning;
 };
