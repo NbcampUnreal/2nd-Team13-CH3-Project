@@ -13,7 +13,16 @@ public:
 	ARifle();
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	virtual void Reload()override;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	virtual void CompleteReload()override;
+
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	virtual void Attack()override;
+
+	virtual void UpgradeAttackDamage()override;
+	virtual void UpgradeAttackRate()override;
+	virtual void UpgradeMaxAmmo()override;
+	virtual void UpgradeReloadTime()override;
+
 };

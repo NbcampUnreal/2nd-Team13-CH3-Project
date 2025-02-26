@@ -15,6 +15,7 @@ void APiercingBullet::OnHit(
 	const FHitResult& SweepResult
 )
 {
+	UE_LOG(LogTemp, Warning, TEXT("OnHit called with %s"), *OtherActor->GetName());
 	/*if (OtherActor && OtherActor->IsA(AEnemyCharacter::StaticClass()))
 	{
 		AEnemyCharacter* HitEnemy = Cast<AEnemyCharacter>(OtherActor);
