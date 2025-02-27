@@ -5,6 +5,7 @@
 
 AExplosiveBullet::AExplosiveBullet()
 {
+    Speed = 100.0f;
     ExplosionRadius = 500.0f; // 폭발 범위
     BulletDamage = 0;   // 폭발 데미지
 }
