@@ -43,4 +43,5 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* ExplosionCollision;
+
 };

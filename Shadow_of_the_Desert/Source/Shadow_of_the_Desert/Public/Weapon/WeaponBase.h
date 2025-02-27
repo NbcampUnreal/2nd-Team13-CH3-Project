@@ -23,8 +23,12 @@ public:
 
 
 protected:
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "WeaponMesh")
     UStaticMeshComponent* WeaponMesh;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "WeaponMesh")
+    USceneComponent* MuzzleMesh; // ÃÑ±¸ À§Ä¡
+
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stat")
     float AttackDamage;
