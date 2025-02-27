@@ -2,6 +2,7 @@
 
 
 #include "EnemySpawner.h"
+#include "Enemy/EnemyCharacterAi.h"
 #include "DrawDebugHelpers.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -81,9 +82,22 @@ void AEnemySpawner::EnemySpawn()
 			}
 		}
 	}
-	// 여기 아래에 몬스터 스폰 코드 추가 or 몬스터 생성 함수
+	//몬스터 스폰 코드 추가 or 몬스터 생성 함수
+	SpawnRandomEnemy(SpawnLocation);
+
 	// 디버그용으로 스폰 위치를 화면에 표시 (5초간 유지, 녹색)
 	DrawDebugSphere(GetWorld(), SpawnLocation, 20.0f, 12, FColor::Green, false, 60.0f);
+}
+
+void AEnemySpawner::SpawnRandomEnemy(FVector SpawnLocation)
+{
+	if (EnemyClasses.Num() > 0)
+	{
+		int32 RandomIndex = FMath::RandRange(0, EnemyClasses.Num() - 1);
+		TSubclassOf<AEnemyCharacterAi> SelectedEnemyClass = EnemyClasses[RandomIndex];
+
+		AEnemyCharacterAi* SpawnedEnemy = GetWorld()->SpawnActor<AEnemyCharacterAi>(SelectedEnemyClass, SpawnLocation, FRotator::ZeroRotator);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -91,10 +105,6 @@ void AEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	for (size_t i = 0; i < 50; i++)
-	{
-		EnemySpawn();
-	}
 }
 
 // Called every frame

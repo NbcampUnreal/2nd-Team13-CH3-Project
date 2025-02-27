@@ -7,6 +7,7 @@
 #include "EnemySpawner.generated.h"
 
 class UBoxComponent;
+class AEnemyCharacterAi;
 
 UCLASS()
 class SHADOW_OF_THE_DESERT_API AEnemySpawner : public AActor
@@ -17,6 +18,7 @@ public:
 	// Sets default values for this actor's properties
 	AEnemySpawner();
 
+	void EnemySpawn();
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning")
 	USceneComponent* Scene;
@@ -27,8 +29,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
 	float AvoidanceRadius = 300.0f;	// 플레이어와 몬스터 스폰지점 사이 최소거리
 
+	// 추가: 스폰할 몬스터 종류 저장
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawning")
+	TArray<TSubclassOf<AEnemyCharacterAi>> EnemyClasses;
+
 	FVector GetRandomPointInVolume() const;
-	void EnemySpawn();
+	void SpawnRandomEnemy(FVector SpawnLocation);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

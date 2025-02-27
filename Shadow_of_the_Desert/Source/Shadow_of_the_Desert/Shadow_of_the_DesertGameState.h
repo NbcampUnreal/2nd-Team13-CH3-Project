@@ -23,13 +23,27 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Enemy")
 	int32 AllEnemyCount;
 
+	// 적 스폰 양
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Enemy")
+	int32 MinSpawnNum;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Enemy")
+	int32 MaxSpawnNum;
+
 	// 게임이 일시정지 상태인지 여부
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Time")
 	bool bIsPaused;
 
-	// 적 스폰 양
-	int32 MinSpawnNum;
-	int32 MaxSpawnNum;
+	//일시정지창
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> PauseMenuWidgetClass;
+
+	//게임 종료창
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> EndMenuWidgetClass;
+
+	// HUD 위젯 생성 및 관리
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> HUDWidgetClass;
 
 	// 보스, 플레이어 사망 여부
 	bool bIsBossDead;
@@ -54,12 +68,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GameFlow")
 	void LocalResumeGame();
 
+	// 게임 리셋 처리
+	UFUNCTION(BlueprintCallable, Category = "GameFlow")
+	void LocalResetGame();
+
+
+	void SetHUDVisibility(bool bVisible);
 	void SpawnBoss();
-	void KillEnemy();
+	void KillEnemy(int32 Score);
 	void EnemySpawn();
 	void TimerUpdate();
 	void UpdateHUD();
-	void GameEnd();
+	void GameEnd(FString Result);
 
 protected:
 	// Called when the game starts or when spawned
@@ -69,4 +89,7 @@ private:
 	// 보스 스폰 여부
 	bool bIsBossSpawned;
 	bool bIsTimerRunning;
+	UUserWidget* PauseMenuWidget;
+	UUserWidget* EndMenuWidget;
+	UUserWidget* HUDWidget;
 };
