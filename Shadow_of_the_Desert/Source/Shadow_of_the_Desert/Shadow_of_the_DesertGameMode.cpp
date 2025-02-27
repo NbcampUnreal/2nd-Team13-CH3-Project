@@ -31,8 +31,6 @@ AShadow_of_the_DesertGameMode::AShadow_of_the_DesertGameMode()
 	static ConstructorHelpers::FClassFinder<UUserWidget> MainMenuBPClass(TEXT("/Game/UI/Widgets/WBP_MainMenu.WBP_MainMenu_C"));
 	if (MainMenuBPClass.Class != nullptr)
 	{
-		//테스트가 완전히 종료되면 주석을 풀면 된다.
-		//MainMenuWidgetClass = nullptr;
 		MainMenuWidgetClass = MainMenuBPClass.Class;
 	}
 }
