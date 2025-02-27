@@ -2,6 +2,9 @@
 
 ARifle::ARifle()
 {
+	AmmoMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AmmoMesh"));
+	AmmoMesh->SetupAttachment(WeaponMesh);
+
 	//Ω∫≈»
 	AttackDamage = 5.0f;
 	CurrentAmmo = 30;

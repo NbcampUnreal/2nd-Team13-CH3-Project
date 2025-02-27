@@ -7,7 +7,8 @@ AWeaponBase::AWeaponBase()
 	LastAttackTime = 0.0f;
 	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
 	RootComponent = WeaponMesh;
-
+	MuzzleMesh = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
+	MuzzleMesh->SetupAttachment(WeaponMesh);
 	//ÃÊ±âÈ­
 	AttackDamage = 0.0f;
 	CurrentAmmo = 0;
@@ -64,12 +65,12 @@ void AWeaponBase::Attack()
 		FRotator CameraRotation;
 		FVector CameraLocation;
 
-
 		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 		if (PlayerController)
 		{
 			PlayerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
-			FVector WeaponLocation = GetActorLocation() + CameraRotation.Vector() * 300.0f;//ÃÑ¾Ë ¹ß»ç À§Ä¡
+
+			FVector WeaponLocation = MuzzleMesh->GetComponentLocation(); // ÃÑ±¸ À§Ä¡
 			//ÅºÆÛÁü
 			float RandomOffsetX = FMath::FRandRange(-SpreadAngle, SpreadAngle);
 			float RandomOffsetY = FMath::FRandRange(-SpreadAngle, SpreadAngle);
@@ -78,7 +79,6 @@ void AWeaponBase::Attack()
 			ABulletBase* Bullet = GetWorld()->SpawnActor<ABulletBase>(BulletClass, WeaponLocation, FRotator::ZeroRotator);
 			if (Bullet)
 			{
-
 				Bullet->Initialize(Direction, AttackDamage);
 			}
 			CurrentAmmo--;
