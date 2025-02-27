@@ -32,8 +32,8 @@ AShadow_of_the_DesertGameMode::AShadow_of_the_DesertGameMode()
 	if (MainMenuBPClass.Class != nullptr)
 	{
 		//테스트가 완전히 종료되면 주석을 풀면 된다.
-		MainMenuWidgetClass = nullptr;
-		//MainMenuWidgetClass = MainMenuBPClass.Class;
+		//MainMenuWidgetClass = nullptr;
+		MainMenuWidgetClass = MainMenuBPClass.Class;
 	}
 }
 
@@ -41,13 +41,17 @@ void AShadow_of_the_DesertGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	ShowMainMenu();
+}
+
+void AShadow_of_the_DesertGameMode::ShowMainMenu()
+{
 	if (MainMenuWidgetClass != nullptr)
 	{
-		// 위젯 생성
-		UUserWidget* MainMenuWidget = CreateWidget<UUserWidget>(GetWorld(), MainMenuWidgetClass);
+		// 위젯 생성 및 저장
+		MainMenuWidget = CreateWidget<UUserWidget>(GetWorld(), MainMenuWidgetClass);
 		if (MainMenuWidget != nullptr)
 		{
-			// 화면에 추가
 			MainMenuWidget->AddToViewport();
 
 			// UI 전용 입력 모드로 전환
@@ -60,5 +64,23 @@ void AShadow_of_the_DesertGameMode::BeginPlay()
 				PC->SetInputMode(InputMode);
 			}
 		}
+	}
+}
+
+void AShadow_of_the_DesertGameMode::CloseMainMenu()
+{
+	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+	{
+		// UI 입력 모드 해제 후 게임 모드로 변경
+		FInputModeGameOnly InputMode;
+		PC->SetInputMode(InputMode);
+		PC->bShowMouseCursor = false;
+	}
+
+	// 메인 메뉴 제거
+	if (MainMenuWidget != nullptr)
+	{
+		MainMenuWidget->RemoveFromViewport();
+		MainMenuWidget = nullptr;  // UI가 완전히 제거되었음을 표시
 	}
 }
