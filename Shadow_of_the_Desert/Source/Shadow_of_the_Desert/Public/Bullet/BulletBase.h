@@ -3,9 +3,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/SphereComponent.h"
+#include "Engine/DamageEvents.h"
+#include "Shadow_of_the_Desert/Enemy/EnemyCharacterAi.h"
 #include "BulletBase.generated.h"
 
+class AEnemyCharacterAi;
+
 UCLASS()
+
 class SHADOW_OF_THE_DESERT_API ABulletBase : public AActor
 {
 	GENERATED_BODY()

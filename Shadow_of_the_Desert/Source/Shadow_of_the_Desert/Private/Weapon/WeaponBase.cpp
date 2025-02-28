@@ -29,8 +29,7 @@ void AWeaponBase::Reload()
 	{
 		GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
 			{
-				FTimerHandle TimerHandle;
-				GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AWeaponBase::CompleteReload, ReloadTime, false);
+				GetWorld()->GetTimerManager().SetTimer(ReloadTimerHandle, this, &AWeaponBase::CompleteReload, ReloadTime, false);
 
 				bIsReloading = true;
 			});
@@ -50,6 +49,18 @@ void AWeaponBase::CompleteReload()
 		LastAttackTime);
 }
 
+void AWeaponBase::CancelReload()
+{
+	if (bIsReloading)
+	{
+		// 리로드 중인 경우 타이머를 취소
+		GetWorld()->GetTimerManager().ClearTimer(ReloadTimerHandle); // TimerHandle은 리로드 타이머 핸들입니다.
+
+		bIsReloading = false; // 리로드 상태 변경
+		UE_LOG(LogTemp, Warning, TEXT("Reload canceled."));
+	}
+}
+
 void AWeaponBase::Attack()
 {
 	if (bIsReloading)
@@ -62,8 +73,6 @@ void AWeaponBase::Attack()
 
 	if (CurrentAmmo > 0 && (CurrentTime - LastAttackTime >= AttackRate))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Shot"));
-
 		FRotator CameraRotation;
 		FVector CameraLocation;
 
