@@ -17,6 +17,4 @@ public:
 	virtual void OnMoveCompleted(FAIRequestID requestId, const FPathFollowingResult& result) override;
 
 protected:
-//	int32 currentPatrolIdx = 0;
-//	void MoveToCurrentPatrolPoint();
 };

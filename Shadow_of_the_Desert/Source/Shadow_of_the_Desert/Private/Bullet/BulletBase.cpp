@@ -1,7 +1,8 @@
 #include "Bullet/BulletBase.h"
 #include "Components/StaticMeshComponent.h"
-//#include "EnemyCharater.h"
-
+#include "Particles/ParticleSystemComponent.h"
+#include "Kismet/GameplayStatics.h"
+//#include "EnemyCharacter.h"
 
 ABulletBase::ABulletBase()
 {
@@ -9,16 +10,16 @@ ABulletBase::ABulletBase()
 
 	BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BulletMesh"));
 	RootComponent = BulletMesh;
-	// RootComponent를 별도로 생성하는 것이 더 안전합니다.
+
 	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 	RootComponent = Root;
-	BulletMesh->SetupAttachment(Root); // 메시를 루트에 부착
+	BulletMesh->SetupAttachment(Root);
 
 	// 콜리전 설정
-	ExplosionCollision = CreateDefaultSubobject<USphereComponent>(TEXT("ExplosionCollision"));
-	ExplosionCollision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-	ExplosionCollision->SetupAttachment(BulletMesh);
-	ExplosionCollision->OnComponentBeginOverlap.AddDynamic(this, &ABulletBase::OnHit);
+	HitCollision = CreateDefaultSubobject<USphereComponent>(TEXT("HitCollision"));
+	HitCollision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+	HitCollision->SetupAttachment(BulletMesh);
+	HitCollision->OnComponentBeginOverlap.AddDynamic(this, &ABulletBase::OnHit);
 
 	Speed = 3000.0f;
 	BulletDamage = 0.0f;
@@ -27,7 +28,6 @@ ABulletBase::ABulletBase()
 void ABulletBase::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 void ABulletBase::Tick(float DeltaTime)
@@ -39,10 +39,11 @@ void ABulletBase::Tick(float DeltaTime)
 
 }
 
-void ABulletBase::Initialize(FVector Direction, float Damage)
+void ABulletBase::Initialize(FVector Direction, float Damage, APawn* InstigatorPawn)
 {
 	MovementDirection = Direction;
 	BulletDamage = Damage;
+	SetInstigator(InstigatorPawn);
 
 	// 매시 방향 설정
 	if (!MovementDirection.IsNearlyZero())
@@ -50,6 +51,7 @@ void ABulletBase::Initialize(FVector Direction, float Damage)
 		const FRotator NewRotation = FRotationMatrix::MakeFromX(MovementDirection).Rotator();
 		SetActorRotation(NewRotation);
 	}
+
 }
 
 void ABulletBase::OnHit(
@@ -61,4 +63,33 @@ void ABulletBase::OnHit(
 	const FHitResult& SweepResult
 )
 {
+}
+
+void ABulletBase::BulletEffects()
+{
+	UParticleSystemComponent* Particle = nullptr;
+
+	if (HitParticle)
+	{
+		Particle = UGameplayStatics::SpawnEmitterAtLocation(
+			GetWorld(),
+			HitParticle,
+			GetActorLocation(),
+			GetActorRotation(),
+			false
+		);
+	}
+	if (HitSound)
+	{
+		//UGameplayStatics::PlaySoundAtLocation(
+		//	GetWorld(),
+		//	HitSound,
+		//	GetActorLocation()
+		//);
+		UAudioComponent* AudioComponent = UGameplayStatics::SpawnSoundAtLocation(
+			GetWorld(),
+			HitSound,
+			GetActorLocation()
+		);
+	}
 }

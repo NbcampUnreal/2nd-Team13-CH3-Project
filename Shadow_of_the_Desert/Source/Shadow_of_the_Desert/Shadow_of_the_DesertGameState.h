@@ -75,19 +75,17 @@ public:
 
 	void SetHUDVisibility(bool bVisible);
 	void SpawnBoss();
-	void KillEnemy(int32 Score);
+	void KillEnemy(int32 Score);	// 적을 죽었을때
 	void EnemySpawn();
 	void TimerUpdate();
 	void UpdateHUD();
-	void GameEnd(FString Result);
+	void GameEnd(FString Result);	// 게임 종료
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 private:
-	// 보스 스폰 여부
-	bool bIsBossSpawned;
 	bool bIsTimerRunning;
 	UUserWidget* PauseMenuWidget;
 	UUserWidget* EndMenuWidget;

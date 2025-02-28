@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Components/SphereComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Animation/AnimSequence.h"
 #include "Animation/AnimInstance.h"
+#include "Kismet/GameplayStatics.h"
 #include "EnemyCharacterAi.generated.h"
 
 UCLASS()
@@ -25,9 +27,11 @@ public:
 	void EnemyTakeDamage(const int32 damage);
 	UFUNCTION(BlueprintCallable)
 	void EnemyDespawn();
-	UFUNCTION(BlueprintCallable)
-	void PlayAnimation();
 
+	UFUNCTION(BlueprintCallable)
+	void PlayAttackAnimation();
+	UFUNCTION(BlueprintCallable)
+	void PlayDeadAnimation();
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy|Status")
 	int32 maxHp;
@@ -35,8 +39,14 @@ protected:
 	int32 currentHp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Status")
 	int32 attackPower;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Animation")
 	UAnimSequence* attackAnim;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Animation")
+	UAnimSequence* deadAnim;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Collision")
 	USphereComponent* attackCollision;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Collision")
+	UCapsuleComponent* hitBoxCollision;
 };
