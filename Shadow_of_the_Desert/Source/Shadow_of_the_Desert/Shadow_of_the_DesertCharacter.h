@@ -74,9 +74,16 @@ protected:
 	void StartSprint(const FInputActionValue& value);
 	UFUNCTION()
 	void StopSprint(const FInputActionValue& value);
+	//UFUNCTION(BlueprintCallable)
+	//void Player_Ues_Pistol();
+	//UFUNCTION(BlueprintCallable)
+	//void Player_Ues_Rifle();
+	//UFUNCTION(BlueprintCallable)
+	//void Player_Ues_ShotGun();
 
 
 	void UpdateOverheadHP();
+	float GetHelth();
 
 	virtual void NotifyControllerChanged() override;
 

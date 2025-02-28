@@ -180,3 +180,7 @@ void AShadow_of_the_DesertCharacter::StopSprint(const FInputActionValue& value)
 		GetCharacterMovement()->MaxWalkSpeed = Speed;
 	}
 }
+
+float AShadow_of_the_DesertCharacter::GetHelth() {
+	return Health;
+}
