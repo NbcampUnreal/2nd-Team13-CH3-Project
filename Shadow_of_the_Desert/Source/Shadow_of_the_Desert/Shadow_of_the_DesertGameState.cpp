@@ -4,6 +4,7 @@
 #include "Shadow_of_the_DesertGameState.h"
 #include "Shadow_of_the_DesertGameMode.h"
 #include "Shadow_of_the_DesertGameInstance.h"
+#include "Shadow_of_the_DesertCharacter.h"
 #include "EnemySpawner.h"
 #include "Player_Controller.h"
 #include "Kismet/GameplayStatics.h"
@@ -16,7 +17,6 @@ AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 	AllEnemyCount = 0;
 	MinSpawnNum = 10;
 	MaxSpawnNum = 15;
-	bIsBossSpawned = false;
 	bIsBossDead = false;
 	bIsPlayerDead = false;
 	bIsTimerRunning = false;
@@ -45,17 +45,6 @@ void AShadow_of_the_DesertGameState::LocalStartGame()
 		GetWorldTimerManager().SetTimer(GameTimerHandle, this, &AShadow_of_the_DesertGameState::TimerUpdate, 1.f, true);
 	}
 
-	//첫스폰
-	EnemySpawn();
-
-	//그 이후 10초마다 스폰 false에서 true로 바꿔주면됨
-	GetWorldTimerManager().SetTimer(
-		EnemyTimerHandle,
-		this,
-		&AShadow_of_the_DesertGameState::EnemySpawn,
-		10.0f,
-		false);
-
 	// 게임 시작시 HUD 위젯 생성 및 추가
 	if (HUDWidgetClass)
 	{
@@ -79,6 +68,17 @@ void AShadow_of_the_DesertGameState::LocalStartGame()
 	{
 		GameMode->CloseMainMenu();
 	}
+
+	//첫스폰
+	EnemySpawn();
+
+	//그 이후 10초마다 스폰 false에서 true로 바꿔주면됨
+	GetWorldTimerManager().SetTimer(
+		EnemyTimerHandle,
+		this,
+		&AShadow_of_the_DesertGameState::EnemySpawn,
+		10.0f,
+		false);
 }
 
 void AShadow_of_the_DesertGameState::LocalPauseGame()
@@ -153,28 +153,25 @@ void AShadow_of_the_DesertGameState::SetHUDVisibility(bool bVisible)
 void AShadow_of_the_DesertGameState::SpawnBoss()
 {
 	//보스 스폰 코드 작성
-	bIsBossSpawned = true;
+	bIsBossDead = true;
 }
 
 void AShadow_of_the_DesertGameState::KillEnemy(int32 Score)
 {
+	if (UShadow_of_the_DesertGameInstance* SOTDInstance = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
+	{
+		SOTDInstance->TotalScore += Score;
+	}
+
+	KillEnemyCount++;
+
+	//게임 종료 조건 모든 몬스터랑 보스를 죽이면
 	if (bIsBossDead && KillEnemyCount >= AllEnemyCount)
 	{
-		//점수 여기서 추가하면될듯?
-		//보스와 모든 몬스터를 죽이면 게임 종료
 		GameEnd("Clear");
 	}
 	else
 	{
-		//점수 추가함수 여기다가
-
-		if (AllEnemyCount <= 0 && KillEnemyCount >= AllEnemyCount)
-		{
-			return;
-		}
-
-		KillEnemyCount++;
-		
 		if (KillEnemyCount > 0 && KillEnemyCount >= AllEnemyCount)
 		{
 			EnemySpawn();
@@ -184,31 +181,31 @@ void AShadow_of_the_DesertGameState::KillEnemy(int32 Score)
 
 void AShadow_of_the_DesertGameState::EnemySpawn()
 {
-	if (!bIsBossSpawned)
+	// 보스 출현시간
+	if (LocalElapsedTime >= 60.0f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Enemy Spawned"));
-		float CurrentTime = GetWorld()->GetTimeSeconds();
-		if (CurrentTime >= 60.0f)
-		{
-			SpawnBoss();
-			GetWorldTimerManager().ClearTimer(EnemyTimerHandle);
-		}
+		// 보스 소환 후 몬스터 스폰 멈추기(지금은 끝나는거 구분만)
+		SpawnBoss();
+		GetWorldTimerManager().ClearTimer(EnemyTimerHandle);
 
-		//이 아래에 적 스폰 코드 작성
-		int32 RandomSpawn = FMath::RandRange(MinSpawnNum, MaxSpawnNum);
-		AEnemySpawner* EnemySpawner = Cast<AEnemySpawner>(UGameplayStatics::GetActorOfClass(this, AEnemySpawner::StaticClass()));
+		return;
+	}
 
-		if (!EnemySpawner)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("EnemySpawner not found"));
-			return;
-		}
+	// Min~Max 랜덤 숫자만큼 스폰시키기
+	int32 RandomSpawn = FMath::RandRange(MinSpawnNum, MaxSpawnNum);
+	AEnemySpawner* EnemySpawner = Cast<AEnemySpawner>(UGameplayStatics::GetActorOfClass(this, AEnemySpawner::StaticClass()));
 
-		for (size_t i = 0; i < RandomSpawn; i++)
-		{
-			EnemySpawner->EnemySpawn();
-			AllEnemyCount++;
-		}
+	// 스포너 배치되어있는지 확인(나중에 빼도 되는 코드?)
+	if (!EnemySpawner)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("EnemySpawner not found"));
+		return;
+	}
+	// 몬스터 스폰
+	for (size_t i = 0; i < RandomSpawn; i++)
+	{
+		EnemySpawner->EnemySpawn();
+		AllEnemyCount++;
 	}
 }
 
@@ -219,6 +216,19 @@ void AShadow_of_the_DesertGameState::TimerUpdate()
 	{
 		LocalElapsedTime += 1.0f;
 		UE_LOG(LogTemp, Warning, TEXT("Elapsed Time: %.1f"), LocalElapsedTime);
+
+		// 분마다 난이도 올라가게끔?
+		int CurrentMinutes = FMath::FloorToInt(LocalElapsedTime / 60.0f);
+		static int PreviousMinutes = 0;
+
+		if (CurrentMinutes > PreviousMinutes)
+		{
+			MinSpawnNum += 5;
+			MaxSpawnNum += 5;
+
+			PreviousMinutes = CurrentMinutes;
+			UE_LOG(LogTemp, Warning, TEXT("%d Minute"), CurrentMinutes);
+		}
 	}
 }
 
@@ -247,11 +257,32 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 	//		TimeText->SetText(FText::FromString(FString::Printf(TEXT("Time: %02d:%02d"), Minutes, Seconds)));
 	//	}
 
-	//	// 체력바 업데이트
-	//	UProgressBar* HealthBar = Cast<UProgressBar>(HUDWidget->GetWidgetFromName(TEXT("HealthBar")));
-	//	if (HealthBar)
+	//	// 현재 플레이어 컨트롤러를 통해 조종 중인 캐릭터 가져오기
+	//	ACharacter* PlayerCharacter = Cast<ACharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+
+	//	if (PlayerCharacter)
 	//	{
-	//		HealthBar->SetPercent(PlayerHP / 100.0f);
+	//		AShadow_of_the_DesertCharacter* MyCharacter = Cast<AShadow_of_the_DesertCharacter>(PlayerCharacter);
+
+	//		if (MyCharacter)
+	//		{
+	//			int32 PlayerHP = MyCharacter->Health;
+	//			int32 MaxHP = MyCharacter->MaxHealth;
+
+	//			// 체력 정보를 HUD에 반영
+	//			UTextBlock* HealthText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("HealthText")));
+	//			if (HealthText)
+	//			{
+	//				HealthText->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), PlayerHP, MaxHP)));
+	//			}
+
+	//			UProgressBar* HealthBar = Cast<UProgressBar>(HUDWidget->GetWidgetFromName(TEXT("HealthBar")));
+	//			if (HealthBar)
+	//			{
+	//				float HPPercent = static_cast<float>(PlayerHP) / MaxHP;
+	//				HealthBar->SetPercent(HPPercent);
+	//			}
+	//		}
 	//	}
 	//}
 }
