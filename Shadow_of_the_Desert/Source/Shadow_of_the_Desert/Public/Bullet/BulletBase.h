@@ -12,14 +12,12 @@ class SHADOW_OF_THE_DESERT_API ABulletBase : public AActor
 	
 public:	
 	ABulletBase();
-
 protected:
 	virtual void BeginPlay() override;
-
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	void Initialize(FVector Direction, float Damage);
+	void Initialize(FVector Direction, float Damage, APawn* InstigatorPawn);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	virtual void OnHit(
@@ -30,18 +28,25 @@ public:
 		bool bFromSweep,
 		const FHitResult& SweepResult
 	);
+	
+	virtual void BulletEffects();
 
 protected:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* BulletMesh;
 
 	UPROPERTY(VisibleAnywhere)
+	USphereComponent* HitCollision;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet|Effects")
+	USoundBase* HitSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet|Effects")
+	UParticleSystem* HitParticle;
+
+	UPROPERTY(VisibleAnywhere)
 	float Speed;
 
 	FVector MovementDirection;
 	float BulletDamage;
-
-	UPROPERTY(VisibleAnywhere)
-	USphereComponent* ExplosionCollision;
-
 };

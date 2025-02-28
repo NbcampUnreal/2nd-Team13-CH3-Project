@@ -18,4 +18,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	virtual void Attack()override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "WeaponMesh")
+	UStaticMeshComponent* RocketLauncherBulletMesh;
 };

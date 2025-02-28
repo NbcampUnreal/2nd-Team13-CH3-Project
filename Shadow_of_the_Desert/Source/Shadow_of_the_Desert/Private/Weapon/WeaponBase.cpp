@@ -23,6 +23,8 @@ AWeaponBase::AWeaponBase()
 
 void AWeaponBase::Reload()
 {
+	if (bIsReloading) return;
+
 	if (CurrentAmmo < MaxAmmo)
 	{
 		GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
@@ -74,12 +76,15 @@ void AWeaponBase::Attack()
 			//ÅºÆÛÁü
 			float RandomOffsetX = FMath::FRandRange(-SpreadAngle, SpreadAngle);
 			float RandomOffsetY = FMath::FRandRange(-SpreadAngle, SpreadAngle);
-			FVector Direction = (CameraRotation.Vector() + FVector(RandomOffsetX, RandomOffsetY, 0)).GetSafeNormal();
+			FVector Direction = (CameraRotation.Vector() + FVector(RandomOffsetX, 0, 0)).GetSafeNormal();
+
+			APawn* CharacterInstigator = Cast<APawn>(GetOwner()); // ÃÑ¾ËÀ» ¹ß»çÇÏ´Â Ä³¸¯ÅÍ
+			UE_LOG(LogTemp, Warning, TEXT("Current Actor: %s"), *GetName());
 
 			ABulletBase* Bullet = GetWorld()->SpawnActor<ABulletBase>(BulletClass, WeaponLocation, FRotator::ZeroRotator);
 			if (Bullet)
 			{
-				Bullet->Initialize(Direction, AttackDamage);
+				Bullet->Initialize(Direction, AttackDamage, CharacterInstigator);
 			}
 			CurrentAmmo--;
 			UE_LOG(LogTemp, Warning, TEXT("END CurrentAmmo: %d, bIsReloading: %s, LastAttackTime: %f"),

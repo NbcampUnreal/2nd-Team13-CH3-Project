@@ -25,5 +25,6 @@ void ANomalBullet::OnHit(
 			HitEnemy->TakeDamage(BulletDamage, FDamageEvent(), nullptr, this);
 		}
 		Destroy();
-	}	*/
+	}	
+	*/
 }
