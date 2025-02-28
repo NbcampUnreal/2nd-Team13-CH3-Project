@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
+#include "Components/ProgressBar.h"
 
 AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 {
@@ -266,15 +267,18 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 
 	//		if (MyCharacter)
 	//		{
+	//			//체력
 	//			int32 PlayerHP = MyCharacter->Health;
 	//			int32 MaxHP = MyCharacter->MaxHealth;
 
-	//			// 체력 정보를 HUD에 반영
-	//			UTextBlock* HealthText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("HealthText")));
-	//			if (HealthText)
+	//			UProgressBar* HealthBar = Cast<UProgressBar>(HUDWidget->GetWidgetFromName(TEXT("HealthBar")));
+	//			if (HealthBar)
 	//			{
-	//				HealthText->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), PlayerHP, MaxHP)));
+	//				float HPPercent = static_cast<float>(PlayerHP) / MaxHP;
+	//				HealthBar->SetPercent(HPPercent);
 	//			}
+
+	//			//경험치
 
 	//			UProgressBar* HealthBar = Cast<UProgressBar>(HUDWidget->GetWidgetFromName(TEXT("HealthBar")));
 	//			if (HealthBar)
