@@ -62,6 +62,10 @@ AShadow_of_the_DesertCharacter::AShadow_of_the_DesertCharacter()
 	MaxHealth = 100.0f;
 	Health = MaxHealth;
 
+	Ues_Rifle_now = true;
+	Ues_Sniper_now = false;
+	Ues_Rocket_now = false;
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -97,19 +101,29 @@ void AShadow_of_the_DesertCharacter::SetupPlayerInputComponent(UInputComponent* 
 			if (PlayerController->LookAciton)
 			{
 				EnhancedInputComponent->BindAction(PlayerController->LookAciton, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Look);
-				UE_LOG(LogTemp, Warning, TEXT("Im Look"));
+
 			}
 			if (PlayerController->JumpAciton)
 			{
 				EnhancedInputComponent->BindAction(PlayerController->JumpAciton, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::StartJump);
 				EnhancedInputComponent->BindAction(PlayerController->MoveAction, ETriggerEvent::Completed, this, &AShadow_of_the_DesertCharacter::StopJump);
-				UE_LOG(LogTemp, Warning, TEXT("Im Jump"));
+			
 			}
 			if (PlayerController->SprintAction)
 			{
 				EnhancedInputComponent->BindAction(PlayerController->SprintAction, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::StartSprint);
 				EnhancedInputComponent->BindAction(PlayerController->SprintAction, ETriggerEvent::Completed, this, &AShadow_of_the_DesertCharacter::StopSprint);
-				UE_LOG(LogTemp, Warning, TEXT("Im Sprint"));
+				
+			}
+			if (PlayerController->ShotAction)
+			{
+				EnhancedInputComponent->BindAction(PlayerController->ShotAction, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Shot);
+				UE_LOG(LogTemp, Warning, TEXT("Im Shot"));
+			}
+			if (PlayerController->ReLoadAction)
+			{
+				EnhancedInputComponent->BindAction(PlayerController->ReLoadAction, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Reload);
+				UE_LOG(LogTemp, Warning, TEXT("Im Reload"));
 			}
 		}
 	}
@@ -180,7 +194,19 @@ void AShadow_of_the_DesertCharacter::StopSprint(const FInputActionValue& value)
 		GetCharacterMovement()->MaxWalkSpeed = Speed;
 	}
 }
+void AShadow_of_the_DesertCharacter::Shot(const FInputActionValue& value)
+{
+	//weapon과 연동
+}
+void AShadow_of_the_DesertCharacter::Reload(const FInputActionValue& value)
+{
+	//weapon과 연동
+}
 
 float AShadow_of_the_DesertCharacter::GetHelth() {
 	return Health;
+}
+float AShadow_of_the_DesertCharacter::GetMaxHelth()
+{
+	return MaxHealth;
 }
