@@ -97,13 +97,11 @@ void AShadow_of_the_DesertCharacter::SetupPlayerInputComponent(UInputComponent* 
 			if (PlayerController->LookAciton)
 			{
 				EnhancedInputComponent->BindAction(PlayerController->LookAciton, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Look);
-				UE_LOG(LogTemp, Warning, TEXT("Im Look"));
 			}
 			if (PlayerController->JumpAciton)
 			{
 				EnhancedInputComponent->BindAction(PlayerController->JumpAciton, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::StartJump);
 				EnhancedInputComponent->BindAction(PlayerController->MoveAction, ETriggerEvent::Completed, this, &AShadow_of_the_DesertCharacter::StopJump);
-				UE_LOG(LogTemp, Warning, TEXT("Im Jump"));
 			}
 			if (PlayerController->SprintAction)
 			{
