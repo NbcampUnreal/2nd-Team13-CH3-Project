@@ -15,6 +15,7 @@ AEnemyCharacterAi::AEnemyCharacterAi()
 	attackPower = 10.0f;
 
 	attackAnim = nullptr;
+	deadAnim = nullptr;
 
 	attackCollision = CreateDefaultSubobject<USphereComponent>(TEXT("AttackCollision"));
 	attackCollision->SetupAttachment(RootComponent);
@@ -23,6 +24,12 @@ AEnemyCharacterAi::AEnemyCharacterAi()
 	attackCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
 	attackCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
 	attackCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+
+	hitBoxCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("HitBoxCollision"));
+	hitBoxCollision->SetupAttachment(RootComponent);
+
+	hitBoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	hitBoxCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
 }
 
 void AEnemyCharacterAi::EnemyAttack()
@@ -35,7 +42,7 @@ void AEnemyCharacterAi::EnemyAttack()
 			attackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}, 0.5f, false);
 
-	PlayAnimation();
+	PlayAttackAnimation();
 	ApplyDamage();
 }
 
@@ -57,19 +64,12 @@ void AEnemyCharacterAi::ApplyDamage()
 	}
 }
 
-void AEnemyCharacterAi::PlayAnimation()
-{
-	if (attackAnim && GetMesh())
-	{
-		GetMesh()->PlayAnimation(attackAnim, false);
-	}
-}
-
 void AEnemyCharacterAi::EnemyTakeDamage(const int32 damage)
 {
 	currentHp -= damage;
 	if (currentHp <= 0)
 	{
+		PlayDeadAnimation();
 		FTimerHandle delayTime;
 		GetWorld()->GetTimerManager().SetTimer(delayTime, this, &AEnemyCharacterAi::EnemyDespawn, 5.0f, false);
 	}
@@ -78,4 +78,20 @@ void AEnemyCharacterAi::EnemyTakeDamage(const int32 damage)
 void AEnemyCharacterAi::EnemyDespawn()
 {
 	Destroy();
+}
+
+void AEnemyCharacterAi::PlayAttackAnimation()
+{
+	if (attackAnim && GetMesh())
+	{
+		GetMesh()->PlayAnimation(attackAnim, false);
+	}
+}
+
+void AEnemyCharacterAi::PlayDeadAnimation()
+{
+	if (attackAnim && GetMesh())
+	{
+		GetMesh()->PlayAnimation(deadAnim, false);
+	}
 }
