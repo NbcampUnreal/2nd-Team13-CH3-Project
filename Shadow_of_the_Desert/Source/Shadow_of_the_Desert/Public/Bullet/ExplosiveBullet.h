@@ -15,7 +15,7 @@ public:
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Explosion")
-	float ExplosionRadius; // Æø¹ß ¹üÀ§
+	float ExplosionRadius; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	void BeginPlay() override;
 	UFUNCTION()

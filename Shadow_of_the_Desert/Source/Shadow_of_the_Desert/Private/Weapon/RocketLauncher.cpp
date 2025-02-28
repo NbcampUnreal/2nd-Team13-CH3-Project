@@ -2,6 +2,9 @@
 
 ARocketLauncher::ARocketLauncher()
 {
+	RocketLauncherBulletMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RocketLauncherBulletMesh"));
+	RocketLauncherBulletMesh->SetupAttachment(WeaponMesh);
+
 	//스탯
 	AttackDamage = 100.0f;
 	CurrentAmmo = 1;
@@ -9,7 +12,7 @@ ARocketLauncher::ARocketLauncher()
 	bIsReloading = false;
 	AttackRate = 2.0f;
 	ReloadTime = 3.0f;
-	SpreadAngle = 0.01f;
+	SpreadAngle = 0.5f;
 
 	//레벨업 시 증가량
 	DamageIncreaseRate = 20.0f;
@@ -26,9 +29,17 @@ void ARocketLauncher::Reload()
 void ARocketLauncher::CompleteReload()
 {
 	Super::CompleteReload();
+	if (!RocketLauncherBulletMesh->IsVisible())
+	{
+		RocketLauncherBulletMesh->SetVisibility(true);
+	}
 }
 
 void ARocketLauncher::Attack()
 {
 	Super::Attack();
+	if (CurrentAmmo <= 0)
+	{
+		RocketLauncherBulletMesh->SetVisibility(false);
+	}
 }
