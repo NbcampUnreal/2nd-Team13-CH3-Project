@@ -21,6 +21,7 @@ public:
 
 	void CloseMainMenu();
 
+	void RestartGame(); // 플레이어 리스폰 함수
 protected:
 	virtual void BeginPlay() override;
 

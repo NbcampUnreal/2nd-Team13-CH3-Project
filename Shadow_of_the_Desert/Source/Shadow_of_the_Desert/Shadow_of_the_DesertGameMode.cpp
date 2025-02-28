@@ -82,3 +82,19 @@ void AShadow_of_the_DesertGameMode::CloseMainMenu()
 		MainMenuWidget = nullptr;  // UI가 완전히 제거되었음을 표시
 	}
 }
+
+void AShadow_of_the_DesertGameMode::RestartGame()
+{
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	if (!PlayerController) return;
+
+	// 기존 플레이어 제거
+	APawn* PlayerPawn = PlayerController->GetPawn();
+	if (PlayerPawn)
+	{
+		PlayerPawn->Destroy(); // 기존 캐릭터 삭제
+	}
+
+	// 플레이어 리스폰
+	RestartPlayer(PlayerController); // 자동으로 PlayerStart에서 리스폰
+}
