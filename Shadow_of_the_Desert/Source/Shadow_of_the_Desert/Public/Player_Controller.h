@@ -34,4 +34,10 @@ public:
 	UInputAction* ReLoadAction;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* ShotAction;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* Swap_Rifle_Hand;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* Swap_Sinper_Hand;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* Swap_Rocket_Hand;
 };
