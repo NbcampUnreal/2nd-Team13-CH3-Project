@@ -30,4 +30,8 @@ public:
 	UInputAction* JumpAciton;
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* SprintAction;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ReLoadAction;
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* ShotAction;
 };

@@ -12,6 +12,8 @@ APlayer_Controller::APlayer_Controller()
 	MoveAction(nullptr),
 	LookAciton(nullptr),
 	JumpAciton(nullptr),
-	SprintAction(nullptr)
+	SprintAction(nullptr),
+	ReLoadAction(nullptr),
+	ShotAction(nullptr)
 {
 }

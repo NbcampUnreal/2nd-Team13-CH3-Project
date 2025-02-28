@@ -46,7 +46,8 @@ class AShadow_of_the_DesertCharacter : public ACharacter
 
 public:
 	AShadow_of_the_DesertCharacter();
-	
+	float GetHelth();
+	float GetMaxHelth();
 
 protected:
 
@@ -58,6 +59,12 @@ protected:
 	float MaxDefensive;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Defensive")
 	float Defensive;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	bool Ues_Rifle_now;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	bool Ues_Sniper_now;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	bool Ues_Rocket_now;
 
 	/** Called for movement input */
 	UFUNCTION()
@@ -74,6 +81,10 @@ protected:
 	void StartSprint(const FInputActionValue& value);
 	UFUNCTION()
 	void StopSprint(const FInputActionValue& value);
+	UFUNCTION()
+	void Shot(const FInputActionValue& value);
+	UFUNCTION()
+	void Reload(const FInputActionValue& value);
 	//UFUNCTION(BlueprintCallable)
 	//void Player_Ues_Pistol();
 	//UFUNCTION(BlueprintCallable)
@@ -83,7 +94,6 @@ protected:
 
 
 	void UpdateOverheadHP();
-	float GetHelth();
 
 	virtual void NotifyControllerChanged() override;
 
