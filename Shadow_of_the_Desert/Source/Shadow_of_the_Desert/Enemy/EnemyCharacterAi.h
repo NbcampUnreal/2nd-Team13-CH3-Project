@@ -8,6 +8,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Animation/AnimSequence.h"
 #include "Animation/AnimInstance.h"
+#include "Components/PrimitiveComponent.h"
+#include "../Shadow_of_the_DesertGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "EnemyCharacterAi.generated.h"
 
@@ -24,9 +26,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ApplyDamage();
 	UFUNCTION(BlueprintCallable)
-	void EnemyTakeDamage(const int32 damage);
+	void EnemyTakeDamage(const float damage);
 	UFUNCTION(BlueprintCallable)
 	void EnemyDespawn();
+	UFUNCTION(BlueprintCallable)
+	void OnHit(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult
+	);
+	UFUNCTION(BlueprintCallable)
+	void ActivateAttackCollision();
+	UFUNCTION(BlueprintCallable)
+	void DisableAttackCollision();
 
 	UFUNCTION(BlueprintCallable)
 	void PlayAttackAnimation();
@@ -34,11 +49,15 @@ public:
 	void PlayDeadAnimation();
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy|Status")
-	int32 maxHp;
+	float maxHp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Status")
-	int32 currentHp;
+	float currentHp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Status")
-	int32 attackPower;
+	float attackPower;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Status")
+	int32 scorePoint;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Status")
+	float attackSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Animation")
 	UAnimSequence* attackAnim;
