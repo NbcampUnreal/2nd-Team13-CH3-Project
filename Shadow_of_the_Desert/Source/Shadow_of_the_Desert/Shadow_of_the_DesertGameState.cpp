@@ -30,8 +30,6 @@ AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 
 void AShadow_of_the_DesertGameState::LocalStartGame()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Game Started"));
-
 	// 게임 시작시 초기화
 	if (UShadow_of_the_DesertGameInstance* SOTDInstance = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
 	{
@@ -113,8 +111,6 @@ void AShadow_of_the_DesertGameState::LocalPauseGame()
 			}
 		}
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Game Paused"));
 }
 
 void AShadow_of_the_DesertGameState::LocalResumeGame()
@@ -140,8 +136,6 @@ void AShadow_of_the_DesertGameState::LocalResumeGame()
 		// HUD 다시 표시
 		SetHUDVisibility(true);
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Game Resumed"));
 }
 
 void AShadow_of_the_DesertGameState::SetHUDVisibility(bool bVisible)
@@ -202,7 +196,6 @@ void AShadow_of_the_DesertGameState::EnemySpawn()
 	// 스포너 배치되어있는지 확인(나중에 빼도 되는 코드?)
 	if (!EnemySpawner)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("EnemySpawner not found"));
 		return;
 	}
 	// 몬스터 스폰
@@ -219,7 +212,6 @@ void AShadow_of_the_DesertGameState::TimerUpdate()
 	if (!bIsPaused)
 	{
 		LocalElapsedTime += 1.0f;
-		UE_LOG(LogTemp, Warning, TEXT("Elapsed Time: %.1f"), LocalElapsedTime);
 
 		// 분마다 난이도 올라가게끔?
 		int CurrentMinutes = FMath::FloorToInt(LocalElapsedTime / 60.0f);
@@ -305,8 +297,6 @@ void AShadow_of_the_DesertGameState::LocalResetGame()
 
 void AShadow_of_the_DesertGameState::LocalReStartGame()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Game Restart"));
-
 	if (EndMenuWidget)
 	{
 		EndMenuWidget->RemoveFromViewport();
