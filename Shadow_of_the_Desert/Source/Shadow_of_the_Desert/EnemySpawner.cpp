@@ -86,7 +86,7 @@ void AEnemySpawner::EnemySpawn()
 	SpawnRandomEnemy(SpawnLocation);
 
 	// 디버그용으로 스폰 위치를 화면에 표시 (5초간 유지, 녹색)
-	DrawDebugSphere(GetWorld(), SpawnLocation, 20.0f, 12, FColor::Green, false, 60.0f);
+	//DrawDebugSphere(GetWorld(), SpawnLocation, 20.0f, 12, FColor::Green, false, 60.0f);
 }
 
 void AEnemySpawner::SpawnRandomEnemy(FVector SpawnLocation)
