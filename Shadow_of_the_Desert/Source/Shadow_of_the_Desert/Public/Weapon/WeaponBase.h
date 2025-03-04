@@ -20,6 +20,7 @@ public:
     virtual void UpgradeAttackRate();
     virtual void UpgradeMaxAmmo();
     virtual void UpgradeReloadTime();
+    void CancelReload();
 
 
 protected:
@@ -40,6 +41,7 @@ protected:
     bool bIsReloading; // 리로드 중인지 여부
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stat")
     float ReloadTime; // 재장전 시간
+    FTimerHandle ReloadTimerHandle;//재장전 타이머
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stat")
     float AttackRate; // 연사 속도
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stat")
@@ -57,4 +59,5 @@ protected:
     int32 AmmoIncreaseRate;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Upgrade")
     float ReloadTimeIncreaseRate;
+
 };

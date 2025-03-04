@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "../Public/Weapon/WeaponBase.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "Shadow_of_the_DesertCharacter.generated.h"
@@ -66,6 +67,9 @@ protected:
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
 	bool Ues_Rocket_now;
 
+	
+	
+
 	/** Called for movement input */
 	UFUNCTION()
 	void Move(const FInputActionValue& Value);
@@ -85,15 +89,19 @@ protected:
 	void Shot(const FInputActionValue& value);
 	UFUNCTION()
 	void Reload(const FInputActionValue& value);
-	//UFUNCTION(BlueprintCallable)
-	//void Player_Ues_Pistol();
-	//UFUNCTION(BlueprintCallable)
-	//void Player_Ues_Rifle();
-	//UFUNCTION(BlueprintCallable)
-	//void Player_Ues_ShotGun();
+	UFUNCTION()
+	void Swap_Rifle(const FInputActionValue& value);
+	UFUNCTION()
+	void Swap_Sinper(const FInputActionValue& value);
+	UFUNCTION()
+	void Swap_Rocket(const FInputActionValue& value);
 
 
-	void UpdateOverheadHP();
+	virtual float TakeDamage(float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		AController* EventInstigator,
+		AActor* DamageCauser) override;
+
 
 	virtual void NotifyControllerChanged() override;
 

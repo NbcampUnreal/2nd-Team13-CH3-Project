@@ -20,7 +20,6 @@ protected:
 	void BeginPlay() override;
 	UFUNCTION()
 	void Explode(FVector Location);
-
 	
 	virtual void OnHit(
 		UPrimitiveComponent* OverlappedComponent,
