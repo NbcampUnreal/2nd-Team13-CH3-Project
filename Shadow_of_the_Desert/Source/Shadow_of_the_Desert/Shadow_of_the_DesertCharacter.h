@@ -6,6 +6,9 @@
 #include "../Public/Weapon/WeaponBase.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "Weapon/Rifle.h"
+#include "Weapon/Sniper.h"
+#include "Weapon/RocketLauncher.h"
 #include "Shadow_of_the_DesertCharacter.generated.h"
 
 class USpringArmComponent;
@@ -40,8 +43,19 @@ public:
 		struct FDamageEvent const& DamageEvent,
 		AController* EventInstigator,
 		AActor* DamageCauser) override;
+	void EquipWeapon(TSubclassOf<AWeaponBase> WeaponClass);
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	AWeaponBase* EquippedWeapon;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	TSubclassOf<ARifle> RifleClass;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	TSubclassOf<ASniper> SniperClass;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	TSubclassOf<ARocketLauncher> RocketLauncherClass;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Health")
 	float MaxHealth;
@@ -59,7 +73,7 @@ protected:
 	bool Ues_Rocket_now;
 
 	
-	
+	void BeginPlay() override;
 
 	/** Called for movement input */
 	UFUNCTION()

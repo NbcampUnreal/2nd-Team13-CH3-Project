@@ -12,7 +12,7 @@ ARifle::ARifle()
 	bIsReloading = false;
 	AttackRate = 0.2f;
 	ReloadTime = 1.5f;
-	SpreadAngle = 0.2f;
+	SpreadAngle = 0.01f;
 
 	//레벨업 시 증가량
 	DamageIncreaseRate = 1.0f;

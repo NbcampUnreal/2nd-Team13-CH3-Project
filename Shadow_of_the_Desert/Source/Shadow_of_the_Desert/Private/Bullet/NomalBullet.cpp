@@ -18,6 +18,7 @@ void ANomalBullet::OnHit(
 {
 	if (OtherActor && OtherActor != this)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("OnHit called with %s"), *OtherActor->GetName());
 		if (OtherActor && OtherActor->IsA(AEnemyCharacterAi::StaticClass()))
 		{
 			AEnemyCharacterAi* HitEnemy = Cast<AEnemyCharacterAi>(OtherActor);

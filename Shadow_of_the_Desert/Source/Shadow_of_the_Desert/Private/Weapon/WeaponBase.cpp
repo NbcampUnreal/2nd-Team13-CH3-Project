@@ -9,6 +9,7 @@ AWeaponBase::AWeaponBase()
 	RootComponent = WeaponMesh;
 	MuzzleMesh = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	MuzzleMesh->SetupAttachment(WeaponMesh);
+	WeaponMesh->SetSimulatePhysics(false);
 	//√ ±‚»≠
 	AttackDamage = 0.0f;
 	CurrentAmmo = 0;
@@ -100,10 +101,6 @@ void AWeaponBase::Attack()
 				LastAttackTime);
 			LastAttackTime = CurrentTime;
 		}
-	}
-	if (CurrentAmmo <= 0)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Reloading Plz."));
 	}
 }
 
