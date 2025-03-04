@@ -68,11 +68,29 @@ AShadow_of_the_DesertCharacter::AShadow_of_the_DesertCharacter()
 	Ues_Sniper_now = false;
 	Ues_Rocket_now = false;
 
-	
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
 }
+
+void AShadow_of_the_DesertCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// 기본 무기 장착
+	if (RifleClass) // RifleClass가 설정되어 있는 경우
+	{
+		EquipWeapon(RifleClass);
+
+		// 무기가 제대로 장착되었는지 확인
+		if (EquippedWeapon)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Weapon equipped: %s"), *EquippedWeapon->GetName());
+		}
+	}
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -103,30 +121,24 @@ void AShadow_of_the_DesertCharacter::SetupPlayerInputComponent(UInputComponent* 
 			}
 			if (PlayerController->LookAciton)
 			{
-				EnhancedInputComponent->BindAction(PlayerController->LookAciton, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Look);
-
-			}
+				EnhancedInputComponent->BindAction(PlayerController->LookAciton, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Look);			}
 			if (PlayerController->JumpAciton)
 			{
 				EnhancedInputComponent->BindAction(PlayerController->JumpAciton, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::StartJump);
 				EnhancedInputComponent->BindAction(PlayerController->MoveAction, ETriggerEvent::Completed, this, &AShadow_of_the_DesertCharacter::StopJump);
-			
 			}
 			if (PlayerController->SprintAction)
 			{
 				EnhancedInputComponent->BindAction(PlayerController->SprintAction, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::StartSprint);
 				EnhancedInputComponent->BindAction(PlayerController->SprintAction, ETriggerEvent::Completed, this, &AShadow_of_the_DesertCharacter::StopSprint);
-				
 			}
 			if (PlayerController->ShotAction)
 			{
 				EnhancedInputComponent->BindAction(PlayerController->ShotAction, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Shot);
-
 			}
 			if (PlayerController->ReLoadAction)
 			{
 				EnhancedInputComponent->BindAction(PlayerController->ReLoadAction, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Reload);
-
 			}
 			if (PlayerController->Swap_Rifle_Hand)
 			{
@@ -214,34 +226,45 @@ void AShadow_of_the_DesertCharacter::StopSprint(const FInputActionValue& value)
 }
 void AShadow_of_the_DesertCharacter::Shot(const FInputActionValue& value)
 {
-	//weapon과 연동
-	if (Ues_Rifle_now)
+	if (EquippedWeapon)
 	{
-		
+		// 무기와 연동
+		EquippedWeapon->Attack(); // 무기의 Attack() 함수 호출
 	}
-	else if (Ues_Sniper_now)
+	else
 	{
-
-	}
-	else if (Ues_Rocket_now)
-	{
-
+		UE_LOG(LogTemp, Warning, TEXT("No weapon equipped!"));
 	}
 }
+
+
 void AShadow_of_the_DesertCharacter::Reload(const FInputActionValue& value)
 {
-	//weapon과 연동
+	if (EquippedWeapon)
+	{
+		// 무기와 연동
+		EquippedWeapon->Reload(); // 무기의 Attack() 함수 호출
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No weapon equipped!"));
+	}
 }
-void AShadow_of_the_DesertCharacter::Swap_Rifle(const FInputActionValue& value) {
-	//라이플로 총 변환
-}
-void AShadow_of_the_DesertCharacter::Swap_Sinper(const FInputActionValue& value) {
-	//스나이퍼로 총 변환
+void AShadow_of_the_DesertCharacter::Swap_Rifle(const FInputActionValue& value)
+{
+	EquipWeapon(RifleClass); // RifleClass는 TSubclassOf<AWeaponBase>로 선언되어 있어야 합니다.
 }
 
-void AShadow_of_the_DesertCharacter::Swap_Rocket(const FInputActionValue& value) {
-	//로켓 런처로 변환
+void AShadow_of_the_DesertCharacter::Swap_Sinper(const FInputActionValue& value)
+{
+	EquipWeapon(SniperClass); // SniperClass도 마찬가지로 선언 필요
 }
+
+void AShadow_of_the_DesertCharacter::Swap_Rocket(const FInputActionValue& value)
+{
+	EquipWeapon(RocketLauncherClass); // RocketLauncherClass도 필요
+}
+
 float AShadow_of_the_DesertCharacter::GetHelth() {
 	return Health;
 }
@@ -260,4 +283,49 @@ float AShadow_of_the_DesertCharacter::TakeDamage(float DamageAmount,
 	Health = FMath::Clamp(Health - DamageAmount, 0.0f, MaxHealth);
 
 	return ActualDamage;
+}
+
+void AShadow_of_the_DesertCharacter::EquipWeapon(TSubclassOf<AWeaponBase> WeaponClass)
+{
+	if (WeaponClass)
+	{
+		if (EquippedWeapon)
+		{
+			EquippedWeapon->Destroy(); // 기존 무기 삭제
+			EquippedWeapon = nullptr;  // 포인터 초기화
+		}
+
+		// 무기를 생성
+		EquippedWeapon = GetWorld()->SpawnActor<AWeaponBase>(WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator);
+		UE_LOG(LogTemp, Warning, TEXT("Weapon class: %s"), *WeaponClass->GetName()); // 무기 클래스 로그 출력
+
+		if (EquippedWeapon)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Weapon equipped: %s"), *EquippedWeapon->GetName());
+
+			USkeletalMeshComponent* SkeletalMesh = GetMesh();
+			if (SkeletalMesh)
+			{
+				// 무기를 왼손 소켓에 부착
+				EquippedWeapon->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_l"));
+
+				FRotator NewRotation = GetActorRotation();
+				EquippedWeapon->SetActorRotation(NewRotation + FRotator(0.0f, 0.0f, 0.0f));
+				/*// 캐릭터의 캡슐 컴포넌트 앞쪽 위치 계산
+				FVector ForwardVector = GetActorForwardVector(); // 캐릭터의 앞 방향
+				FVector SpawnLocation = GetCapsuleComponent()->GetComponentLocation() + ForwardVector * 100.0f; // 캡슐 앞쪽으로 100 유닛 이동
+
+				// 무기를 새로운 위치에 설정
+				EquippedWeapon->SetActorLocation(SpawnLocation);
+				EquippedWeapon->SetActorRotation(GetActorRotation()); // 캐릭터의 회전과 동일하게 설정
+
+				// 무기를 캡슐 컴포넌트에 부착
+				UCapsuleComponent* Capsule = GetCapsuleComponent(); // 캐릭터의 캡슐 컴포넌트 가져오기
+				if (Capsule)
+				{
+					EquippedWeapon->AttachToComponent(Capsule, FAttachmentTransformRules::KeepRelativeTransform);
+				}*/
+			}
+		}
+	}
 }
