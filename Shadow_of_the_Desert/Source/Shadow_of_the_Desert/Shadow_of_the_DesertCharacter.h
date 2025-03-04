@@ -6,12 +6,16 @@
 #include "../Public/Weapon/WeaponBase.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "Weapon/Rifle.h"
+#include "Weapon/Sniper.h"
+#include "Weapon/RocketLauncher.h"
 #include "Shadow_of_the_DesertCharacter.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+class AWeaponBase;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -28,29 +32,30 @@ class AShadow_of_the_DesertCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
-	
-	///** MappingContext */
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	//UInputMappingContext* DefaultMappingContext;
-
-	///** Jump Input Action */
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	//UInputAction* JumpAction;
-
-	/////** Move Input Action */
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	//UInputAction* MoveAction;
-
-	/////** Look Input Action */
-	////UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	//UInputAction* LookAction;
 
 public:
 	AShadow_of_the_DesertCharacter();
 	float GetHelth();
 	float GetMaxHelth();
+	AWeaponBase* Weapon;
+
+	virtual float TakeDamage(float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		AController* EventInstigator,
+		AActor* DamageCauser) override;
+	void EquipWeapon(TSubclassOf<AWeaponBase> WeaponClass);
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	AWeaponBase* EquippedWeapon;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	TSubclassOf<ARifle> RifleClass;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	TSubclassOf<ASniper> SniperClass;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	TSubclassOf<ARocketLauncher> RocketLauncherClass;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Health")
 	float MaxHealth;
@@ -68,7 +73,7 @@ protected:
 	bool Ues_Rocket_now;
 
 	
-	
+	void BeginPlay() override;
 
 	/** Called for movement input */
 	UFUNCTION()
@@ -97,10 +102,6 @@ protected:
 	void Swap_Rocket(const FInputActionValue& value);
 
 
-	virtual float TakeDamage(float DamageAmount,
-		struct FDamageEvent const& DamageEvent,
-		AController* EventInstigator,
-		AActor* DamageCauser) override;
 
 
 	virtual void NotifyControllerChanged() override;

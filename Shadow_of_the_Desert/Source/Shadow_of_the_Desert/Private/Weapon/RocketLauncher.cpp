@@ -12,7 +12,7 @@ ARocketLauncher::ARocketLauncher()
 	bIsReloading = false;
 	AttackRate = 2.0f;
 	ReloadTime = 3.0f;
-	SpreadAngle = 0.5f;
+	SpreadAngle = 0.01f;
 
 	//레벨업 시 증가량
 	DamageIncreaseRate = 20.0f;
