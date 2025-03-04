@@ -1,7 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Shadow_of_the_DesertCharacter.h"
+#include "../Public/Weapon/Rifle.h"
 #include "Engine/LocalPlayer.h"
+#include "Engine/Engine.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -62,6 +64,12 @@ AShadow_of_the_DesertCharacter::AShadow_of_the_DesertCharacter()
 	MaxHealth = 100.0f;
 	Health = MaxHealth;
 
+	Ues_Rifle_now = true;
+	Ues_Sniper_now = false;
+	Ues_Rocket_now = false;
+
+	
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -92,24 +100,48 @@ void AShadow_of_the_DesertCharacter::SetupPlayerInputComponent(UInputComponent* 
 			if (PlayerController->MoveAction)
 			{
 				EnhancedInputComponent->BindAction(PlayerController->MoveAction, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Move);
-				UE_LOG(LogTemp, Warning, TEXT("Im Move"));
 			}
 			if (PlayerController->LookAciton)
 			{
 				EnhancedInputComponent->BindAction(PlayerController->LookAciton, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Look);
-				UE_LOG(LogTemp, Warning, TEXT("Im Look"));
+
 			}
 			if (PlayerController->JumpAciton)
 			{
 				EnhancedInputComponent->BindAction(PlayerController->JumpAciton, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::StartJump);
 				EnhancedInputComponent->BindAction(PlayerController->MoveAction, ETriggerEvent::Completed, this, &AShadow_of_the_DesertCharacter::StopJump);
-				UE_LOG(LogTemp, Warning, TEXT("Im Jump"));
+			
 			}
 			if (PlayerController->SprintAction)
 			{
 				EnhancedInputComponent->BindAction(PlayerController->SprintAction, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::StartSprint);
 				EnhancedInputComponent->BindAction(PlayerController->SprintAction, ETriggerEvent::Completed, this, &AShadow_of_the_DesertCharacter::StopSprint);
-				UE_LOG(LogTemp, Warning, TEXT("Im Sprint"));
+				
+			}
+			if (PlayerController->ShotAction)
+			{
+				EnhancedInputComponent->BindAction(PlayerController->ShotAction, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Shot);
+
+			}
+			if (PlayerController->ReLoadAction)
+			{
+				EnhancedInputComponent->BindAction(PlayerController->ReLoadAction, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Reload);
+
+			}
+			if (PlayerController->Swap_Rifle_Hand)
+			{
+				EnhancedInputComponent->BindAction(PlayerController->Swap_Rifle_Hand, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Swap_Rifle);
+
+			}
+			if (PlayerController->Swap_Sinper_Hand)
+			{
+				EnhancedInputComponent->BindAction(PlayerController->Swap_Sinper_Hand, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Swap_Sinper);
+
+			}
+			if (PlayerController->Swap_Rocket_Hand)
+			{
+				EnhancedInputComponent->BindAction(PlayerController->Swap_Rocket_Hand, ETriggerEvent::Triggered, this, &AShadow_of_the_DesertCharacter::Swap_Rocket);
+
 			}
 		}
 	}
@@ -180,7 +212,52 @@ void AShadow_of_the_DesertCharacter::StopSprint(const FInputActionValue& value)
 		GetCharacterMovement()->MaxWalkSpeed = Speed;
 	}
 }
+void AShadow_of_the_DesertCharacter::Shot(const FInputActionValue& value)
+{
+	//weapon과 연동
+	if (Ues_Rifle_now)
+	{
+		
+	}
+	else if (Ues_Sniper_now)
+	{
 
+	}
+	else if (Ues_Rocket_now)
+	{
+
+	}
+}
+void AShadow_of_the_DesertCharacter::Reload(const FInputActionValue& value)
+{
+	//weapon과 연동
+}
+void AShadow_of_the_DesertCharacter::Swap_Rifle(const FInputActionValue& value) {
+	//라이플로 총 변환
+}
+void AShadow_of_the_DesertCharacter::Swap_Sinper(const FInputActionValue& value) {
+	//스나이퍼로 총 변환
+}
+
+void AShadow_of_the_DesertCharacter::Swap_Rocket(const FInputActionValue& value) {
+	//로켓 런처로 변환
+}
 float AShadow_of_the_DesertCharacter::GetHelth() {
 	return Health;
+}
+float AShadow_of_the_DesertCharacter::GetMaxHelth()
+{
+	return MaxHealth;
+}
+
+float AShadow_of_the_DesertCharacter::TakeDamage(float DamageAmount,
+	struct FDamageEvent const& DamageEvent,
+	AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	Health = FMath::Clamp(Health - DamageAmount, 0.0f, MaxHealth);
+
+	return ActualDamage;
 }

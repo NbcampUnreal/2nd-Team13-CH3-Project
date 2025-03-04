@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "../Public/Weapon/WeaponBase.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "Shadow_of_the_DesertCharacter.generated.h"
@@ -46,7 +47,8 @@ class AShadow_of_the_DesertCharacter : public ACharacter
 
 public:
 	AShadow_of_the_DesertCharacter();
-	
+	float GetHelth();
+	float GetMaxHelth();
 
 protected:
 
@@ -58,6 +60,15 @@ protected:
 	float MaxDefensive;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Defensive")
 	float Defensive;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	bool Ues_Rifle_now;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	bool Ues_Sniper_now;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	bool Ues_Rocket_now;
+
+	
+	
 
 	/** Called for movement input */
 	UFUNCTION()
@@ -74,16 +85,23 @@ protected:
 	void StartSprint(const FInputActionValue& value);
 	UFUNCTION()
 	void StopSprint(const FInputActionValue& value);
-	//UFUNCTION(BlueprintCallable)
-	//void Player_Ues_Pistol();
-	//UFUNCTION(BlueprintCallable)
-	//void Player_Ues_Rifle();
-	//UFUNCTION(BlueprintCallable)
-	//void Player_Ues_ShotGun();
+	UFUNCTION()
+	void Shot(const FInputActionValue& value);
+	UFUNCTION()
+	void Reload(const FInputActionValue& value);
+	UFUNCTION()
+	void Swap_Rifle(const FInputActionValue& value);
+	UFUNCTION()
+	void Swap_Sinper(const FInputActionValue& value);
+	UFUNCTION()
+	void Swap_Rocket(const FInputActionValue& value);
 
 
-	void UpdateOverheadHP();
-	float GetHelth();
+	virtual float TakeDamage(float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		AController* EventInstigator,
+		AActor* DamageCauser) override;
+
 
 	virtual void NotifyControllerChanged() override;
 

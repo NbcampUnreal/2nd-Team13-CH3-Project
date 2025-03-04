@@ -12,6 +12,11 @@ APlayer_Controller::APlayer_Controller()
 	MoveAction(nullptr),
 	LookAciton(nullptr),
 	JumpAciton(nullptr),
-	SprintAction(nullptr)
+	SprintAction(nullptr),
+	ReLoadAction(nullptr),
+	Swap_Rifle_Hand(nullptr),
+	Swap_Rocket_Hand(nullptr),
+	Swap_Sinper_Hand(nullptr),
+	ShotAction(nullptr)
 {
 }
