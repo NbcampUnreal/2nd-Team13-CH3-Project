@@ -2,7 +2,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
-//#include "EnemyCharacter.h"
+#include "GameFramework/DamageType.h"
+
 
 ABulletBase::ABulletBase()
 {
@@ -51,7 +52,6 @@ void ABulletBase::Initialize(FVector Direction, float Damage, APawn* InstigatorP
 		const FRotator NewRotation = FRotationMatrix::MakeFromX(MovementDirection).Rotator();
 		SetActorRotation(NewRotation);
 	}
-
 }
 
 void ABulletBase::OnHit(
@@ -81,11 +81,6 @@ void ABulletBase::BulletEffects()
 	}
 	if (HitSound)
 	{
-		//UGameplayStatics::PlaySoundAtLocation(
-		//	GetWorld(),
-		//	HitSound,
-		//	GetActorLocation()
-		//);
 		UAudioComponent* AudioComponent = UGameplayStatics::SpawnSoundAtLocation(
 			GetWorld(),
 			HitSound,

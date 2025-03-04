@@ -2,7 +2,7 @@
 
 APiercingBullet::APiercingBullet()
 {
-	Speed = 9000.0f;
+	Speed = 500.0f;
 	BulletDamage = 0.0f;
 }
 
@@ -15,17 +15,28 @@ void APiercingBullet::OnHit(
 	const FHitResult& SweepResult
 )
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnHit called with %s"), *OtherActor->GetName());
-	/*if (OtherActor && OtherActor->IsA(AEnemyCharacter::StaticClass()))
+	if (OtherActor == GetOwner())
 	{
-		AEnemyCharacter* HitEnemy = Cast<AEnemyCharacter>(OtherActor);
-		if (HitEnemy)
+		return;
+	}    
+
+	if (OtherActor && OtherActor != this)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("OnHit called with %s"), *OtherActor->GetName());
+		if (OtherActor && OtherActor->IsA(AEnemyCharacterAi::StaticClass()))
 		{
-			HitEnemy->TakeDamage(BulletDamage, FDamageEvent(), nullptr, this);
+			if (AEnemyCharacterAi* HitEnemy = Cast<AEnemyCharacterAi>(OtherActor))
+			{
+				if (HitEnemy)
+				{
+					HitEnemy->EnemyTakeDamage(BulletDamage);
+				}
+				UE_LOG(LogTemp, Warning, TEXT("Damage Applied: %.2f"), BulletDamage); // [[4]](#__4)
+			}
+		}
+		else
+		{
+			Destroy();
 		}
 	}
-	else
-	{
-		Destroy();
-	}*/
 }

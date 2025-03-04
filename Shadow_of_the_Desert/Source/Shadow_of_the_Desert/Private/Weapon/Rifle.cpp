@@ -10,7 +10,7 @@ ARifle::ARifle()
 	CurrentAmmo = 30;
 	MaxAmmo = 30;
 	bIsReloading = false;
-	AttackRate = 0.1f;
+	AttackRate = 0.2f;
 	ReloadTime = 1.5f;
 	SpreadAngle = 0.2f;
 

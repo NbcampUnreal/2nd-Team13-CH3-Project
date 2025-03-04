@@ -29,8 +29,7 @@ void AWeaponBase::Reload()
 	{
 		GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
 			{
-				FTimerHandle TimerHandle;
-				GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AWeaponBase::CompleteReload, ReloadTime, false);
+				GetWorld()->GetTimerManager().SetTimer(ReloadTimerHandle, this, &AWeaponBase::CompleteReload, ReloadTime, false);
 
 				bIsReloading = true;
 			});
@@ -50,6 +49,18 @@ void AWeaponBase::CompleteReload()
 		LastAttackTime);
 }
 
+void AWeaponBase::CancelReload()
+{
+	if (bIsReloading)
+	{
+		// 리로드 중인 경우 타이머를 취소
+		GetWorld()->GetTimerManager().ClearTimer(ReloadTimerHandle); // TimerHandle은 리로드 타이머 핸들입니다.
+
+		bIsReloading = false; // 리로드 상태 변경
+		UE_LOG(LogTemp, Warning, TEXT("Reload canceled."));
+	}
+}
+
 void AWeaponBase::Attack()
 {
 	if (bIsReloading)
@@ -62,8 +73,6 @@ void AWeaponBase::Attack()
 
 	if (CurrentAmmo > 0 && (CurrentTime - LastAttackTime >= AttackRate))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Shot"));
-
 		FRotator CameraRotation;
 		FVector CameraLocation;
 
@@ -74,9 +83,8 @@ void AWeaponBase::Attack()
 
 			FVector WeaponLocation = MuzzleMesh->GetComponentLocation(); // 총구 위치
 			//탄퍼짐
-			float RandomOffsetX = FMath::FRandRange(-SpreadAngle, SpreadAngle);
-			float RandomOffsetY = FMath::FRandRange(-SpreadAngle, SpreadAngle);
-			FVector Direction = (CameraRotation.Vector() + FVector(RandomOffsetX, 0, 0)).GetSafeNormal();
+			FVector RandomOffset = FMath::VRand() * SpreadAngle;
+			FVector Direction = (CameraRotation.Vector() + RandomOffset).GetSafeNormal();
 
 			APawn* CharacterInstigator = Cast<APawn>(GetOwner()); // 총알을 발사하는 캐릭터
 			UE_LOG(LogTemp, Warning, TEXT("Current Actor: %s"), *GetName());

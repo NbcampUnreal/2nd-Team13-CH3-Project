@@ -3,6 +3,7 @@
 #include "GameFramework/Character.h"
 
 
+
 AExplosiveBullet::AExplosiveBullet()
 {
     Speed = 200.0f;
@@ -40,6 +41,66 @@ void AExplosiveBullet::OnHit(
         Super::BulletEffects();
     }
 }
+
+
+void AExplosiveBullet::Explode(FVector Location)
+{
+
+    TArray<AActor*> IgnoredActors;
+
+    // 플레이어 캐릭터 추가
+    if (APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+    {
+        IgnoredActors.AddUnique(PlayerPawn);
+        UE_LOG(LogTemp, Warning, TEXT("Added Player: %s"), *GetNameSafe(PlayerPawn)); // [[1]](#__1)
+    }
+
+    AController* DamageInstigator = nullptr;
+    if (AActor* ValidInstigator = GetInstigator())
+    {
+        IgnoredActors.AddUnique(ValidInstigator);
+        DamageInstigator = ValidInstigator->GetInstigatorController();
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("Ignored Actors Count: %d"), IgnoredActors.Num());
+    TArray<AActor*> AEnemyActors;
+    TArray<AActor*> AllEnemies;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyCharacterAi::StaticClass(), AllEnemies);
+    for (AActor* Actor : AllEnemies)
+    {
+        if (Actor && FVector::Dist(Actor->GetActorLocation(), Location) <= ExplosionRadius)
+        {
+            AEnemyActors.Add(Actor); // 범위 내의 적 추가
+        }
+    }
+    UGameplayStatics::ApplyRadialDamage(
+        GetWorld(),
+        BulletDamage,
+        Location,
+        ExplosionRadius,
+        nullptr,
+        IgnoredActors,
+        this, // Damage Causer
+        DamageInstigator // Controller
+    );
+    UE_LOG(LogTemp, Warning, TEXT("Damage Applied: %.2f"), BulletDamage); // [[4]](#__4)
+    DrawDebugSphere(GetWorld(), Location, ExplosionRadius, 12, FColor::Red, false, 3.0f);  // 
+    for (AActor* Actor : AEnemyActors)
+    {
+        if (AEnemyCharacterAi* Enemy = Cast<AEnemyCharacterAi>(Actor))
+        {
+            Enemy->EnemyTakeDamage(BulletDamage);
+            UE_LOG(LogTemp, Warning, TEXT("Enemy %s took damage: %.2f"), *Enemy->GetName(), BulletDamage);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Actor %s is not an enemy"), *Actor->GetName());
+        }
+    }
+
+}
+
+
 /*
 void AExplosiveBullet::Explode(FVector Location)
 {
@@ -76,7 +137,7 @@ void AExplosiveBullet::Explode(FVector Location)
             nullptr,
             IgnoredActors,
             this,
-            GetInstigator()->GetController() 
+            GetInstigator()->GetController()
         );
     }
 
@@ -98,38 +159,3 @@ void AExplosiveBullet::Explode(FVector Location)
     }
 }
 */
-
-void AExplosiveBullet::Explode(FVector Location)
-{
-
-    TArray<AActor*> IgnoredActors;
-
-    // 플레이어 캐릭터 추가 (이중 체크)
-    if (APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
-    {
-        IgnoredActors.AddUnique(PlayerPawn);
-        UE_LOG(LogTemp, Warning, TEXT("Added Player: %s"), *GetNameSafe(PlayerPawn)); // [[1]](#__1)
-    }
-
-    // Instigator 유효성 검사 개선
-    AController* DamageInstigator = nullptr;
-    if (AActor* ValidInstigator = GetInstigator())
-    {
-        IgnoredActors.AddUnique(ValidInstigator);
-        DamageInstigator = ValidInstigator->GetInstigatorController();
-    }
-
-    UE_LOG(LogTemp, Warning, TEXT("Ignored Actors Count: %d"), IgnoredActors.Num());
-
-    UGameplayStatics::ApplyRadialDamage(
-        GetWorld(),
-        BulletDamage,
-        Location,
-        ExplosionRadius,
-        nullptr,
-        IgnoredActors,
-        this, // Damage Causer
-        DamageInstigator // Controller
-    );
-    UE_LOG(LogTemp, Warning, TEXT("Damage Applied: %.2f"), BulletDamage); // [[4]](#__4)
-}
