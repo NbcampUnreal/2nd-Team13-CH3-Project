@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Shadow_of_the_DesertCharacter.h"
+#include "Shadow_of_the_DesertGameState.h"
 #include "../Public/Weapon/Rifle.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/Engine.h"
@@ -67,7 +68,7 @@ AShadow_of_the_DesertCharacter::AShadow_of_the_DesertCharacter()
 	Ues_Rifle_now = true;
 	Ues_Sniper_now = false;
 	Ues_Rocket_now = false;
-
+	
 	
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
@@ -231,9 +232,11 @@ void AShadow_of_the_DesertCharacter::Shot(const FInputActionValue& value)
 void AShadow_of_the_DesertCharacter::Reload(const FInputActionValue& value)
 {
 	//weapon과 연동
+	Weapon->Reload();
 }
 void AShadow_of_the_DesertCharacter::Swap_Rifle(const FInputActionValue& value) {
 	//라이플로 총 변환
+
 }
 void AShadow_of_the_DesertCharacter::Swap_Sinper(const FInputActionValue& value) {
 	//스나이퍼로 총 변환
@@ -258,6 +261,13 @@ float AShadow_of_the_DesertCharacter::TakeDamage(float DamageAmount,
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	Health = FMath::Clamp(Health - DamageAmount, 0.0f, MaxHealth);
+	if (Health == 0.0) 
+	{
+		AShadow_of_the_DesertGameState* GameOver = GetWorld() ? GetWorld()->GetGameState<AShadow_of_the_DesertGameState>() : nullptr;
+		if (GameOver) {
+			GameOver->GameEnd("Defeat");
+		}
+	}
 
 	return ActualDamage;
 }
