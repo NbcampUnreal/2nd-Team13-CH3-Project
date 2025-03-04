@@ -47,6 +47,8 @@ public:
 	void PlayAttackAnimation();
 	UFUNCTION(BlueprintCallable)
 	void PlayDeadAnimation();
+
+	float GetAtkPower();
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy|Status")
 	float maxHp;

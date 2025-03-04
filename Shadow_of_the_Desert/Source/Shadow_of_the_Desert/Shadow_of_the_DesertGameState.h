@@ -6,6 +6,8 @@
 #include "GameFramework/GameState.h"
 #include "Shadow_of_the_DesertGameState.generated.h"
 
+class AHUD;
+
 /**
  * 
  */
@@ -24,9 +26,9 @@ public:
 	int32 AllEnemyCount;
 
 	// 적 스폰 양
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Enemy")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	int32 MinSpawnNum;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Enemy")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	int32 MaxSpawnNum;
 
 	// 게임이 일시정지 상태인지 여부
@@ -41,9 +43,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> EndMenuWidgetClass;
 
-	// HUD 위젯 생성 및 관리
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<UUserWidget> HUDWidgetClass;
+	
 
 	// 보스, 플레이어 사망 여부
 	bool bIsBossDead;
@@ -81,6 +81,7 @@ public:
 	void KillEnemy(int32 Score);	// 적을 죽었을때
 	void EnemySpawn();
 	void TimerUpdate();
+	void SetingHUD();
 	void UpdateHUD();
 	void GameEnd(FString Result);	// 게임 종료
 
@@ -90,7 +91,12 @@ protected:
 	
 private:
 	bool bIsTimerRunning;
+	int32 RoundScore;
 	UUserWidget* PauseMenuWidget;
 	UUserWidget* EndMenuWidget;
+
+	// HUD 위젯
+	AHUD* HUDInstance;
+	TSubclassOf<UUserWidget> HUDWidgetClass;
 	UUserWidget* HUDWidget;
 };

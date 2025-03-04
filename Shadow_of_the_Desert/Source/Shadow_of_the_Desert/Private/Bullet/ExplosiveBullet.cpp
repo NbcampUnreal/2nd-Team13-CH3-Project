@@ -43,7 +43,7 @@ void AExplosiveBullet::OnHit(
 }
 
 
-void AExplosiveBullet::Explode(FVector Location)
+/*void AExplosiveBullet::Explode(FVector Location)
 {
 
     TArray<AActor*> IgnoredActors;
@@ -97,7 +97,56 @@ void AExplosiveBullet::Explode(FVector Location)
             UE_LOG(LogTemp, Warning, TEXT("Actor %s is not an enemy"), *Actor->GetName());
         }
     }
+}*/
+void AExplosiveBullet::Explode(FVector Location)
+{
+    TArray<AActor*> IgnoredActors;
 
+    // 플레이어 캐릭터 추가
+    if (APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+    {
+        IgnoredActors.AddUnique(PlayerPawn);
+        UE_LOG(LogTemp, Warning, TEXT("Added Player: %s"), *GetNameSafe(PlayerPawn));
+    }
+
+    AController* DamageInstigator = nullptr;
+    if (AActor* ValidInstigator = GetInstigator())
+    {
+        IgnoredActors.AddUnique(ValidInstigator);
+        DamageInstigator = ValidInstigator->GetInstigatorController();
+    }
+
+    // 모든 적을 가져와서 범위 내의 적을 찾아서 데미지 적용
+    TArray<AActor*> AllEnemies;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyCharacterAi::StaticClass(), AllEnemies);
+    for (AActor* Actor : AllEnemies)
+    {
+        if (Actor && FVector::Dist(Actor->GetActorLocation(), Location) <= ExplosionRadius)
+        {
+            // 적에게 데미지 적용
+            if (AEnemyCharacterAi* Enemy = Cast<AEnemyCharacterAi>(Actor))
+            {
+                Enemy->EnemyTakeDamage(BulletDamage);
+                UE_LOG(LogTemp, Warning, TEXT("Enemy %s took damage: %.2f"), *Enemy->GetName(), BulletDamage);
+            }
+        }
+    }
+
+    // 원형 피해 적용 (적은 제외하고)
+    UGameplayStatics::ApplyRadialDamage(
+        GetWorld(),
+        BulletDamage,
+        Location,
+        ExplosionRadius,
+        nullptr,
+        IgnoredActors,
+        this, // Damage Causer
+        DamageInstigator // Controller
+    );
+
+    // 디버그 로그
+    UE_LOG(LogTemp, Warning, TEXT("Damage Applied: %.2f"), BulletDamage);
+    DrawDebugSphere(GetWorld(), Location, ExplosionRadius, 12, FColor::Red, false, 3.0f);
 }
 
 

@@ -28,6 +28,12 @@ AShadow_of_the_DesertGameMode::AShadow_of_the_DesertGameMode()
 		GameStateClass = GameStateBPClass.Class;
 	}
 	
+	static ConstructorHelpers::FClassFinder<UObject> HUDBPClass(TEXT("/Game/BluePrints/BP_CustomHUD.BP_CustomHUD_C"));
+	if (HUDBPClass.Class != nullptr)
+	{
+		HUDClass = HUDBPClass.Class;
+	}
+
 	static ConstructorHelpers::FClassFinder<UUserWidget> MainMenuBPClass(TEXT("/Game/UI/Widgets/WBP_MainMenu.WBP_MainMenu_C"));
 	if (MainMenuBPClass.Class != nullptr)
 	{
