@@ -16,15 +16,21 @@ void ANomalBullet::OnHit(
 	const FHitResult& SweepResult
 )
 {
-	/*
-	if (OtherActor && OtherActor->IsA(AEnemyCharacter::StaticClass()))
+	if (OtherActor && OtherActor != this)
 	{
-		AEnemyCharacter* HitEnemy = Cast<AEnemyCharacter>(OtherActor);
-		if (HitEnemy)
+		if (OtherActor && OtherActor->IsA(AEnemyCharacterAi::StaticClass()))
 		{
-			HitEnemy->TakeDamage(BulletDamage, FDamageEvent(), nullptr, this);
+			AEnemyCharacterAi* HitEnemy = Cast<AEnemyCharacterAi>(OtherActor);
+			if (HitEnemy)
+			{
+				HitEnemy->EnemyTakeDamage(BulletDamage);
+			}
+			Destroy();
+			UE_LOG(LogTemp, Warning, TEXT("Damage Applied: %.2f"), BulletDamage); // [[4]](#__4)
 		}
-		Destroy();
-	}	
-	*/
+		else
+		{
+			Destroy();
+		}
+	}
 }

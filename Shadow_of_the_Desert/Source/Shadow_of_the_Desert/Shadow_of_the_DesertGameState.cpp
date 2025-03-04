@@ -5,11 +5,13 @@
 #include "Shadow_of_the_DesertGameMode.h"
 #include "Shadow_of_the_DesertGameInstance.h"
 #include "Shadow_of_the_DesertCharacter.h"
+#include "Enemy/EnemyCharacterAi.h"
 #include "EnemySpawner.h"
 #include "Player_Controller.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
+#include "Components/ProgressBar.h"
 
 AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 {
@@ -17,6 +19,8 @@ AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 	AllEnemyCount = 0;
 	MinSpawnNum = 10;
 	MaxSpawnNum = 15;
+	PreviousMinutes = 0;
+	LocalElapsedTime = 0.0f;
 	bIsBossDead = false;
 	bIsPlayerDead = false;
 	bIsTimerRunning = false;
@@ -26,8 +30,6 @@ AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 
 void AShadow_of_the_DesertGameState::LocalStartGame()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Game Started"));
-
 	// 게임 시작시 초기화
 	if (UShadow_of_the_DesertGameInstance* SOTDInstance = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
 	{
@@ -61,7 +63,7 @@ void AShadow_of_the_DesertGameState::LocalStartGame()
 		this,
 		&AShadow_of_the_DesertGameState::UpdateHUD,
 		0.1f,
-		false);
+		true);
 
 	// 메인메뉴 닫기
 	if (AShadow_of_the_DesertGameMode* GameMode = Cast<AShadow_of_the_DesertGameMode>(UGameplayStatics::GetGameMode(this)))
@@ -78,7 +80,7 @@ void AShadow_of_the_DesertGameState::LocalStartGame()
 		this,
 		&AShadow_of_the_DesertGameState::EnemySpawn,
 		10.0f,
-		false);
+		true);
 }
 
 void AShadow_of_the_DesertGameState::LocalPauseGame()
@@ -109,8 +111,6 @@ void AShadow_of_the_DesertGameState::LocalPauseGame()
 			}
 		}
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Game Paused"));
 }
 
 void AShadow_of_the_DesertGameState::LocalResumeGame()
@@ -136,8 +136,6 @@ void AShadow_of_the_DesertGameState::LocalResumeGame()
 		// HUD 다시 표시
 		SetHUDVisibility(true);
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Game Resumed"));
 }
 
 void AShadow_of_the_DesertGameState::SetHUDVisibility(bool bVisible)
@@ -198,7 +196,6 @@ void AShadow_of_the_DesertGameState::EnemySpawn()
 	// 스포너 배치되어있는지 확인(나중에 빼도 되는 코드?)
 	if (!EnemySpawner)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("EnemySpawner not found"));
 		return;
 	}
 	// 몬스터 스폰
@@ -215,11 +212,9 @@ void AShadow_of_the_DesertGameState::TimerUpdate()
 	if (!bIsPaused)
 	{
 		LocalElapsedTime += 1.0f;
-		UE_LOG(LogTemp, Warning, TEXT("Elapsed Time: %.1f"), LocalElapsedTime);
 
 		// 분마다 난이도 올라가게끔?
 		int CurrentMinutes = FMath::FloorToInt(LocalElapsedTime / 60.0f);
-		static int PreviousMinutes = 0;
 
 		if (CurrentMinutes > PreviousMinutes)
 		{
@@ -227,64 +222,67 @@ void AShadow_of_the_DesertGameState::TimerUpdate()
 			MaxSpawnNum += 5;
 
 			PreviousMinutes = CurrentMinutes;
-			UE_LOG(LogTemp, Warning, TEXT("%d Minute"), CurrentMinutes);
+			LocalReStartGame();
 		}
 	}
 }
 
 void AShadow_of_the_DesertGameState::UpdateHUD()
 {
-	//if (HUDWidget)
-	//{
-	//	// 점수 표시
-	//	UTextBlock* ScoreText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("ScoreText")));
-	//	if (ScoreText)
-	//	{
-	//		if (UShadow_of_the_DesertGameInstance* SOTDInstance = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
-	//		{
-	//			int32 Score = SOTDInstance->TotalScore;
-	//			ScoreText->SetText(FText::FromString(FString::Printf(TEXT("Score: %d"), Score)));
-	//		}
-	//	}
+	if (HUDWidget)
+	{
+		//// 점수 표시
+		//UTextBlock* ScoreText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("ScoreText")));
+		//if (ScoreText)
+		//{
+		//	if (UShadow_of_the_DesertGameInstance* SOTDInstance = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
+		//	{
+		//		int32 Score = SOTDInstance->TotalScore;
+		//		ScoreText->SetText(FText::FromString(FString::Printf(TEXT("Score: %d"), Score)));
+		//	}
+		//}
 
-	//	// 진행 시간 표시
-	//	UTextBlock* TimeText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("TimeText")));
-	//	if (TimeText)
-	//	{
-	//		int32 Minutes = static_cast<int32>(LocalElapsedTime) / 60;  // 분 계산
-	//		int32 Seconds = static_cast<int32>(LocalElapsedTime) % 60;  // 초 계산
+		//// 진행 시간 표시
+		//UTextBlock* TimeText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("TimeText")));
+		//if (TimeText)
+		//{
+		//	int32 Minutes = static_cast<int32>(LocalElapsedTime) / 60;  // 분 계산
+		//	int32 Seconds = static_cast<int32>(LocalElapsedTime) % 60;  // 초 계산
 
-	//		TimeText->SetText(FText::FromString(FString::Printf(TEXT("Time: %02d:%02d"), Minutes, Seconds)));
-	//	}
+		//	TimeText->SetText(FText::FromString(FString::Printf(TEXT("Time: %02d:%02d"), Minutes, Seconds)));
+		//}
 
-	//	// 현재 플레이어 컨트롤러를 통해 조종 중인 캐릭터 가져오기
-	//	ACharacter* PlayerCharacter = Cast<ACharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+		//// 현재 플레이어 컨트롤러를 통해 조종 중인 캐릭터 가져오기
+		//ACharacter* PlayerCharacter = Cast<ACharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
-	//	if (PlayerCharacter)
-	//	{
-	//		AShadow_of_the_DesertCharacter* MyCharacter = Cast<AShadow_of_the_DesertCharacter>(PlayerCharacter);
+		//if (PlayerCharacter)
+		//{
+		//	AShadow_of_the_DesertCharacter* MyCharacter = Cast<AShadow_of_the_DesertCharacter>(PlayerCharacter);
 
-	//		if (MyCharacter)
-	//		{
-	//			int32 PlayerHP = MyCharacter->Health;
-	//			int32 MaxHP = MyCharacter->MaxHealth;
+		//	if (MyCharacter)
+		//	{
+		//		//체력
+		//		int32 PlayerHP = MyCharacter->GetHelth();
+		//		int32 MaxHP = MyCharacter->GetMaxHelth();
 
-	//			// 체력 정보를 HUD에 반영
-	//			UTextBlock* HealthText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("HealthText")));
-	//			if (HealthText)
-	//			{
-	//				HealthText->SetText(FText::FromString(FString::Printf(TEXT("%d / %d"), PlayerHP, MaxHP)));
-	//			}
+		//		UProgressBar* HealthBar = Cast<UProgressBar>(HUDWidget->GetWidgetFromName(TEXT("ProgressBar_272")));
+		//		if (HealthBar)
+		//		{
+		//			float HPPercent = static_cast<float>(PlayerHP) / MaxHP;
+		//			HealthBar->SetPercent(HPPercent);
+		//		}
 
-	//			UProgressBar* HealthBar = Cast<UProgressBar>(HUDWidget->GetWidgetFromName(TEXT("HealthBar")));
-	//			if (HealthBar)
-	//			{
-	//				float HPPercent = static_cast<float>(PlayerHP) / MaxHP;
-	//				HealthBar->SetPercent(HPPercent);
-	//			}
-	//		}
-	//	}
-	//}
+		//		//경험치
+
+		//		/*UProgressBar* HealthBar = Cast<UProgressBar>(HUDWidget->GetWidgetFromName(TEXT("ExpBar")));
+		//		if (HealthBar)
+		//		{
+		//			float HPPercent = static_cast<float>(PlayerHP) / MaxHP;
+		//			HealthBar->SetPercent(HPPercent);
+		//		}*/
+		//	}
+		//}
+	}
 }
 
 void AShadow_of_the_DesertGameState::LocalResetGame()
@@ -297,10 +295,66 @@ void AShadow_of_the_DesertGameState::LocalResetGame()
 	UGameplayStatics::OpenLevel(this, FName(*CurrentLevelName));
 }
 
+void AShadow_of_the_DesertGameState::LocalReStartGame()
+{
+	if (EndMenuWidget)
+	{
+		EndMenuWidget->RemoveFromViewport();
+		EndMenuWidget = nullptr; // 포인터 초기화
+	}
+
+	// 현재 존재하는 적들만 제거
+	TArray<AActor*> FoundEnemies;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyCharacterAi::StaticClass(), FoundEnemies);
+
+	for (AActor* Enemy : FoundEnemies)
+	{
+		AEnemyCharacterAi* EnemyAI = Cast<AEnemyCharacterAi>(Enemy);
+		if (EnemyAI)
+		{
+			EnemyAI->Destroy();
+		}
+	}
+
+	// 게임 관련 변수 초기화
+	KillEnemyCount = 0;
+	AllEnemyCount = 0;
+	MinSpawnNum = 10;
+	MaxSpawnNum = 15;
+	PreviousMinutes = 0;
+	LocalElapsedTime = 0.0f;
+	bIsBossDead = false;
+	bIsPlayerDead = false;
+	bIsTimerRunning = false;
+	bIsPaused = false;
+
+
+	// 플레이어 상태 초기화
+	AShadow_of_the_DesertGameMode* GameMode = Cast<AShadow_of_the_DesertGameMode>(UGameplayStatics::GetGameMode(this));
+	if (GameMode)
+	{
+		GameMode->RestartGame();
+	}
+
+	// 타이머 리셋
+	GetWorldTimerManager().ClearTimer(GameTimerHandle);
+	GetWorldTimerManager().ClearTimer(EnemyTimerHandle);
+
+	// 게임 시작
+	LocalStartGame();
+}
+
 void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 {
 	GetWorldTimerManager().ClearTimer(GameTimerHandle);
 	GetWorldTimerManager().ClearTimer(HUDUpdateTimerHandle);
+
+	// 게임 종료시 HUD 제거
+	if (HUDWidget)
+	{
+		HUDWidget->RemoveFromViewport();
+		HUDWidget = nullptr; // 포인터 초기화
+	}
 
 	// 게임 종료 UI 생성 및 표시
 	if (EndMenuWidgetClass && EndMenuWidget == nullptr)
@@ -310,7 +364,7 @@ void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 		{
 			EndMenuWidget->AddToViewport();
 
-			// UI 모드로 변경 (마우스 활성화)
+			// UI 모드로 변경
 			if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 			{
 				FInputModeUIOnly InputMode;
@@ -320,24 +374,56 @@ void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 				PlayerController->SetInputMode(InputMode);
 			}
 
-			// 점수판같은건 여기다가
+			//if (UShadow_of_the_DesertGameInstance* SOTDInstance = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
+			//{
+			//	//점수
+			//	UTextBlock* ScoreText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("")));
+			//	if (ScoreText)
+			//	{
+			//		int32 Score = SOTDInstance->TotalScore;
+			//		ScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), Score)));
+			//	}
 
-			// 승리 패배시 바뀌는값은 여기다가
-			if (Result == "Clear")
-			{
-				UWidget* DefeatLogo = EndMenuWidget->GetWidgetFromName(TEXT("DefeatLogo"));
-				UWidget* VictoryLogo = EndMenuWidget->GetWidgetFromName(TEXT("VictoryLogo"));
+			//	// 총 데미지(입힌 피해)
+			//	UTextBlock* ScoreText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("")));
+			//	if (ScoreText)
+			//	{
+			//		int32 Score = SOTDInstance->TotalScore;
+			//		ScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), Score)));
+			//	}
 
-				if (DefeatLogo)
-				{
-					DefeatLogo->SetVisibility(ESlateVisibility::Hidden);
-				}
+			//	// 총 입은 피해
+			//	UTextBlock* ScoreText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("")));
+			//	if (ScoreText)
+			//	{
+			//		int32 Score = SOTDInstance->TotalScore;
+			//		ScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), Score)));
+			//	}
+			//}
 
-				if (VictoryLogo)
-				{
-					VictoryLogo->SetVisibility(ESlateVisibility::Visible);
-				}
-			}
+			//// 승리 패배시 바뀌는값은 여기다가
+			//if (Result == "Clear")
+			//{
+			//	UWidget* DefeatLogo = EndMenuWidget->GetWidgetFromName(TEXT("DefeatLogo"));
+			//	UWidget* VictoryLogo = EndMenuWidget->GetWidgetFromName(TEXT("VictoryLogo"));
+
+			//	UWidget* DefeatBorder = EndMenuWidget->GetWidgetFromName(TEXT("DefeatBorder"));
+			//	UWidget* VictoryBorder = EndMenuWidget->GetWidgetFromName(TEXT("VictoryBorder"));
+
+			//	// Logo는 여기
+			//	if (DefeatLogo&&VictoryLogo)
+			//	{
+			//		DefeatLogo->SetVisibility(ESlateVisibility::Hidden);
+			//		VictoryLogo->SetVisibility(ESlateVisibility::Visible);
+			//	}
+
+			//	// Border는 여기
+			//	if (DefeatBorder&&VictoryBorder)
+			//	{
+			//		DefeatBorder->SetVisibility(ESlateVisibility::Hidden);
+			//		VictoryBorder->SetVisibility(ESlateVisibility::Visible);
+			//	}
+			//}
 		}
 	}
 }

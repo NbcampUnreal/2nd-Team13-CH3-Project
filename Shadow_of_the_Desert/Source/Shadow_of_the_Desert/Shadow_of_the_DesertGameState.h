@@ -51,11 +51,11 @@ public:
 	
 
 	FTimerHandle GameTimerHandle;
-	
 	FTimerHandle EnemyTimerHandle;
 	FTimerHandle HUDUpdateTimerHandle;
 
 	float LocalElapsedTime;
+	int PreviousMinutes;
 
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void LocalStartGame();
@@ -72,6 +72,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GameFlow")
 	void LocalResetGame();
 
+	UFUNCTION(BlueprintCallable, Category = "GameFlow")
+	void LocalReStartGame();
+
 
 	void SetHUDVisibility(bool bVisible);
 	void SpawnBoss();
@@ -84,7 +87,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
 private:
 	bool bIsTimerRunning;
 	UUserWidget* PauseMenuWidget;
