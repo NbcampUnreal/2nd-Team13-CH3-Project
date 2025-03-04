@@ -204,10 +204,10 @@ void AShadow_of_the_DesertGameState::KillEnemy(int32 Score)
 
 void AShadow_of_the_DesertGameState::EnemySpawn()
 {
-	// 보스 출현시간
-	if (LocalElapsedTime >= 60.0f)
+	// 버티는 시간 종료
+	if (LocalElapsedTime >= 180.0f)
 	{
-		// 보스 소환 후 몬스터 스폰 멈추기(지금은 끝나는거 구분만)
+		// 시간 종료 체크 후 몬스터 스폰 멈추기
 		CheckTimesUp();
 		GetWorldTimerManager().ClearTimer(EnemyTimerHandle);
 
