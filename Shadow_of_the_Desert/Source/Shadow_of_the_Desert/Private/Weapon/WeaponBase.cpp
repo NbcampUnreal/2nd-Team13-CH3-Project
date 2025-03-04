@@ -83,9 +83,8 @@ void AWeaponBase::Attack()
 
 			FVector WeaponLocation = MuzzleMesh->GetComponentLocation(); // ÃÑ±¸ À§Ä¡
 			//ÅºÆÛÁü
-			float RandomOffsetX = FMath::FRandRange(-SpreadAngle, SpreadAngle);
-			float RandomOffsetY = FMath::FRandRange(-SpreadAngle, SpreadAngle);
-			FVector Direction = (CameraRotation.Vector() + FVector(RandomOffsetX, 0, 0)).GetSafeNormal();
+			FVector RandomOffset = FMath::VRand() * SpreadAngle;
+			FVector Direction = (CameraRotation.Vector() + RandomOffset).GetSafeNormal();
 
 			APawn* CharacterInstigator = Cast<APawn>(GetOwner()); // ÃÑ¾ËÀ» ¹ß»çÇÏ´Â Ä³¸¯ÅÍ
 			UE_LOG(LogTemp, Warning, TEXT("Current Actor: %s"), *GetName());

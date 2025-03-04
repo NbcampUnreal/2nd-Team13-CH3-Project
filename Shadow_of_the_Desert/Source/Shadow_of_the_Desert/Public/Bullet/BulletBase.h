@@ -42,7 +42,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* HitCollision;
-
+	 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Bullet|Effects")
 	USoundBase* HitSound;
 
