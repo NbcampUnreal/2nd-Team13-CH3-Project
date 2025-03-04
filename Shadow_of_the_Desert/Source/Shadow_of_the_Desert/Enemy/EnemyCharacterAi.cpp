@@ -70,11 +70,15 @@ void AEnemyCharacterAi::OnHit(
 	if (OtherActor && OtherActor->IsA(AShadow_of_the_DesertCharacter::StaticClass()))
 	{
 		AShadow_of_the_DesertCharacter* playerChr = Cast<AShadow_of_the_DesertCharacter>(OtherActor);
-
-		if (playerChr)
+		AAIController* aiCtl = Cast<AAIController>(GetController());
+		if (playerChr&&aiCtl)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Player Hit");
+//			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Player Hit");
+//			FString dDM = FString::Printf(TEXT("Damage apply : %.2f"), GetAtkPower());
+//			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, dDM);
+//			UE_LOG(LogTemp, Warning, TEXT("%s"), *dDM);
 			//playerChr->TakeDamage(attackPower);
+			playerChr->TakeDamage(GetAtkPower(), FDamageEvent(), aiCtl, this);
 		}
 	}
 }
@@ -97,7 +101,7 @@ void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 	if (currentHp <= 0)
 	{
 		PlayDeadAnimation();
-		AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());
+		AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());		
 		if (gameState)
 		{
 			gameState->KillEnemy(scorePoint);
@@ -146,4 +150,10 @@ void AEnemyCharacterAi::ApplyDamage()
 			}
 		}
 	}
+}
+
+float AEnemyCharacterAi::GetAtkPower()
+{
+//	UE_LOG(LogTemp, Warning, TEXT("%.2f"), attackPower);
+	return attackPower;
 }
