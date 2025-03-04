@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Shadow_of_the_DesertCharacter.h"
+#include "Shadow_of_the_DesertGameState.h"
 #include "../Public/Weapon/Rifle.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/Engine.h"
@@ -68,7 +69,6 @@ AShadow_of_the_DesertCharacter::AShadow_of_the_DesertCharacter()
 	Ues_Sniper_now = false;
 	Ues_Rocket_now = false;
 
-
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
@@ -78,12 +78,12 @@ void AShadow_of_the_DesertCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ±âº» ¹«±â ÀåÂø
-	if (RifleClass) // RifleClass°¡ ¼³Á¤µÇ¾î ÀÖ´Â °æ¿ì
+	// ï¿½âº» ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	if (RifleClass) // RifleClassï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½
 	{
 		EquipWeapon(RifleClass);
 
-		// ¹«±â°¡ Á¦´ë·Î ÀåÂøµÇ¾ú´ÂÁö È®ÀÎ
+		// ï¿½ï¿½ï¿½â°¡ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
 		if (EquippedWeapon)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Weapon equipped: %s"), *EquippedWeapon->GetName());
@@ -228,8 +228,8 @@ void AShadow_of_the_DesertCharacter::Shot(const FInputActionValue& value)
 {
 	if (EquippedWeapon)
 	{
-		// ¹«±â¿Í ¿¬µ¿
-		EquippedWeapon->Attack(); // ¹«±âÀÇ Attack() ÇÔ¼ö È£Ãâ
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+		EquippedWeapon->Attack(); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Attack() ï¿½Ô¼ï¿½ È£ï¿½ï¿½
 	}
 	else
 	{
@@ -242,8 +242,8 @@ void AShadow_of_the_DesertCharacter::Reload(const FInputActionValue& value)
 {
 	if (EquippedWeapon)
 	{
-		// ¹«±â¿Í ¿¬µ¿
-		EquippedWeapon->Reload(); // ¹«±âÀÇ Attack() ÇÔ¼ö È£Ãâ
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+		EquippedWeapon->Reload(); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Attack() ï¿½Ô¼ï¿½ È£ï¿½ï¿½
 	}
 	else
 	{
@@ -252,17 +252,17 @@ void AShadow_of_the_DesertCharacter::Reload(const FInputActionValue& value)
 }
 void AShadow_of_the_DesertCharacter::Swap_Rifle(const FInputActionValue& value)
 {
-	EquipWeapon(RifleClass); // RifleClass´Â TSubclassOf<AWeaponBase>·Î ¼±¾ðµÇ¾î ÀÖ¾î¾ß ÇÕ´Ï´Ù.
+	EquipWeapon(RifleClass); // RifleClassï¿½ï¿½ TSubclassOf<AWeaponBase>ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ ï¿½Ö¾ï¿½ï¿½ ï¿½Õ´Ï´ï¿½.
 }
 
 void AShadow_of_the_DesertCharacter::Swap_Sinper(const FInputActionValue& value)
 {
-	EquipWeapon(SniperClass); // SniperClassµµ ¸¶Âù°¡Áö·Î ¼±¾ð ÇÊ¿ä
+	EquipWeapon(SniperClass); // SniperClassï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½
 }
 
 void AShadow_of_the_DesertCharacter::Swap_Rocket(const FInputActionValue& value)
 {
-	EquipWeapon(RocketLauncherClass); // RocketLauncherClassµµ ÇÊ¿ä
+	EquipWeapon(RocketLauncherClass); // RocketLauncherClassï¿½ï¿½ ï¿½Ê¿ï¿½
 }
 
 float AShadow_of_the_DesertCharacter::GetHelth() {
@@ -281,6 +281,13 @@ float AShadow_of_the_DesertCharacter::TakeDamage(float DamageAmount,
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	Health = FMath::Clamp(Health - DamageAmount, 0.0f, MaxHealth);
+	if (Health == 0.0) 
+	{
+		AShadow_of_the_DesertGameState* GameOver = GetWorld() ? GetWorld()->GetGameState<AShadow_of_the_DesertGameState>() : nullptr;
+		if (GameOver) {
+			GameOver->GameEnd("Defeat");
+		}
+	}
 
 	return ActualDamage;
 }
@@ -291,13 +298,13 @@ void AShadow_of_the_DesertCharacter::EquipWeapon(TSubclassOf<AWeaponBase> Weapon
 	{
 		if (EquippedWeapon)
 		{
-			EquippedWeapon->Destroy(); // ±âÁ¸ ¹«±â »èÁ¦
-			EquippedWeapon = nullptr;  // Æ÷ÀÎÅÍ ÃÊ±âÈ­
+			EquippedWeapon->Destroy(); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+			EquippedWeapon = nullptr;  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
 		}
 
-		// ¹«±â¸¦ »ý¼º
+		// ï¿½ï¿½ï¿½â¸¦ ï¿½ï¿½ï¿½ï¿½
 		EquippedWeapon = GetWorld()->SpawnActor<AWeaponBase>(WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator);
-		UE_LOG(LogTemp, Warning, TEXT("Weapon class: %s"), *WeaponClass->GetName()); // ¹«±â Å¬·¡½º ·Î±× Ãâ·Â
+		UE_LOG(LogTemp, Warning, TEXT("Weapon class: %s"), *WeaponClass->GetName()); // ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½Î±ï¿½ ï¿½ï¿½ï¿½
 
 		if (EquippedWeapon)
 		{
@@ -306,21 +313,21 @@ void AShadow_of_the_DesertCharacter::EquipWeapon(TSubclassOf<AWeaponBase> Weapon
 			USkeletalMeshComponent* SkeletalMesh = GetMesh();
 			if (SkeletalMesh)
 			{
-				// ¹«±â¸¦ ¿Þ¼Õ ¼ÒÄÏ¿¡ ºÎÂø
+				// ï¿½ï¿½ï¿½â¸¦ ï¿½Þ¼ï¿½ ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½
 				EquippedWeapon->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_l"));
 
 				FRotator NewRotation = GetActorRotation();
 				EquippedWeapon->SetActorRotation(NewRotation + FRotator(0.0f, 0.0f, 0.0f));
-				/*// Ä³¸¯ÅÍÀÇ Ä¸½¶ ÄÄÆ÷³ÍÆ® ¾ÕÂÊ À§Ä¡ °è»ê
-				FVector ForwardVector = GetActorForwardVector(); // Ä³¸¯ÅÍÀÇ ¾Õ ¹æÇâ
-				FVector SpawnLocation = GetCapsuleComponent()->GetComponentLocation() + ForwardVector * 100.0f; // Ä¸½¶ ¾ÕÂÊÀ¸·Î 100 À¯´Ö ÀÌµ¿
+				/*// Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ä¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½
+				FVector ForwardVector = GetActorForwardVector(); // Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+				FVector SpawnLocation = GetCapsuleComponent()->GetComponentLocation() + ForwardVector * 100.0f; // Ä¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 100 ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½
 
-				// ¹«±â¸¦ »õ·Î¿î À§Ä¡¿¡ ¼³Á¤
+				// ï¿½ï¿½ï¿½â¸¦ ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 				EquippedWeapon->SetActorLocation(SpawnLocation);
-				EquippedWeapon->SetActorRotation(GetActorRotation()); // Ä³¸¯ÅÍÀÇ È¸Àü°ú µ¿ÀÏÇÏ°Ô ¼³Á¤
+				EquippedWeapon->SetActorRotation(GetActorRotation()); // Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-				// ¹«±â¸¦ Ä¸½¶ ÄÄÆ÷³ÍÆ®¿¡ ºÎÂø
-				UCapsuleComponent* Capsule = GetCapsuleComponent(); // Ä³¸¯ÅÍÀÇ Ä¸½¶ ÄÄÆ÷³ÍÆ® °¡Á®¿À±â
+				// ï¿½ï¿½ï¿½â¸¦ Ä¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+				UCapsuleComponent* Capsule = GetCapsuleComponent(); // Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ä¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 				if (Capsule)
 				{
 					EquippedWeapon->AttachToComponent(Capsule, FAttachmentTransformRules::KeepRelativeTransform);
