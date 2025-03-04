@@ -3,6 +3,7 @@
 
 #include "EnemyCharacterAi.h"
 #include "EnemyAIController.h"
+#include "../Shadow_of_the_DesertCharacter.h"
 
 // Sets default values
 AEnemyCharacterAi::AEnemyCharacterAi()
@@ -13,6 +14,8 @@ AEnemyCharacterAi::AEnemyCharacterAi()
 	maxHp = 100.0f;
 	currentHp = 100.0f;
 	attackPower = 10.0f;
+	scorePoint = 100;
+	attackSpeed = 0.5f;
 
 	attackAnim = nullptr;
 	deadAnim = nullptr;
@@ -25,6 +28,8 @@ AEnemyCharacterAi::AEnemyCharacterAi()
 	attackCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
 	attackCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 
+	attackCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacterAi::OnHit);
+
 	hitBoxCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("HitBoxCollision"));
 	hitBoxCollision->SetupAttachment(RootComponent);
 
@@ -33,17 +38,96 @@ AEnemyCharacterAi::AEnemyCharacterAi()
 }
 
 void AEnemyCharacterAi::EnemyAttack()
-{
-	attackCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-
+{	
 	FTimerHandle attackTimer;
+	//FTimerHandle finishTimer;
 	GetWorld()->GetTimerManager().SetTimer(attackTimer, [this]()
 		{
-			attackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}, 0.5f, false);
-
+			attackCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		}, attackSpeed, false);
+	
 	PlayAttackAnimation();
-	ApplyDamage();
+	//ApplyDamage();
+	//GetWorld()->GetTimerManager().SetTimer(finishTimer, this, &AEnemyCharacterAi::DisableAttackCollision, 0.5f, false);
+	DisableAttackCollision();
+	/*
+	AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());
+	if (gameState)
+	{
+		gameState->KillEnemy(scorePoint);
+	}*/
+}
+
+void AEnemyCharacterAi::OnHit(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult
+)
+{
+	if (OtherActor && OtherActor->IsA(AShadow_of_the_DesertCharacter::StaticClass()))
+	{
+		AShadow_of_the_DesertCharacter* playerChr = Cast<AShadow_of_the_DesertCharacter>(OtherActor);
+
+		if (playerChr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Player Hit");
+			//playerChr->TakeDamage(attackPower);
+		}
+	}
+}
+
+void AEnemyCharacterAi::ActivateAttackCollision()
+{
+	attackCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	FTimerHandle attackTimer;
+	GetWorld()->GetTimerManager().SetTimer(attackTimer, this, &AEnemyCharacterAi::DisableAttackCollision, 0.5f, false);
+}
+
+void AEnemyCharacterAi::DisableAttackCollision()
+{
+	attackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
+{
+	currentHp -= damage;
+	if (currentHp <= 0)
+	{
+		PlayDeadAnimation();
+		AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());
+		if (gameState)
+		{
+			gameState->KillEnemy(scorePoint);
+		}
+		FTimerHandle delayTime;
+		GetWorld()->GetTimerManager().SetTimer(delayTime, this, &AEnemyCharacterAi::EnemyDespawn, 5.0f, false);
+	}
+}
+
+void AEnemyCharacterAi::EnemyDespawn()
+{
+	Destroy();
+}
+
+void AEnemyCharacterAi::PlayAttackAnimation()
+{
+	if (attackAnim && GetMesh())
+	{
+//		FTimerHandle attackTimer;
+//		GetWorld()->GetTimerManager().SetTimer(attackTimer, this, &AEnemyCharacterAi::ActivateAttackCollision, 0.5f, false);
+		GetMesh()->PlayAnimation(attackAnim, false);
+	}
+}
+
+void AEnemyCharacterAi::PlayDeadAnimation()
+{
+	if (attackAnim && GetMesh())
+	{
+		GetMesh()->PlayAnimation(deadAnim, false);
+	}
 }
 
 void AEnemyCharacterAi::ApplyDamage()
@@ -61,37 +145,5 @@ void AEnemyCharacterAi::ApplyDamage()
 				GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Player Hit");
 			}
 		}
-	}
-}
-
-void AEnemyCharacterAi::EnemyTakeDamage(const int32 damage)
-{
-	currentHp -= damage;
-	if (currentHp <= 0)
-	{
-		PlayDeadAnimation();
-		FTimerHandle delayTime;
-		GetWorld()->GetTimerManager().SetTimer(delayTime, this, &AEnemyCharacterAi::EnemyDespawn, 5.0f, false);
-	}
-}
-
-void AEnemyCharacterAi::EnemyDespawn()
-{
-	Destroy();
-}
-
-void AEnemyCharacterAi::PlayAttackAnimation()
-{
-	if (attackAnim && GetMesh())
-	{
-		GetMesh()->PlayAnimation(attackAnim, false);
-	}
-}
-
-void AEnemyCharacterAi::PlayDeadAnimation()
-{
-	if (attackAnim && GetMesh())
-	{
-		GetMesh()->PlayAnimation(deadAnim, false);
 	}
 }
