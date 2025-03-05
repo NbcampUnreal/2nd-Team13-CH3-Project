@@ -5,8 +5,9 @@
 #include "Shadow_of_the_DesertGameMode.h"
 #include "Shadow_of_the_DesertGameInstance.h"
 #include "Shadow_of_the_DesertCharacter.h"
-#include "Enemy/EnemyCharacterAi.h"
 #include "EnemySpawner.h"
+#include "Enemy/EnemyCharacterAi.h"
+#include "Weapon/WeaponBase.h"
 #include "Player_Controller.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
@@ -20,11 +21,12 @@ AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 	RoundScore = 0;
 	KillEnemyCount = 0;
 	AllEnemyCount = 0;
-	MinSpawnNum = 10;
-	MaxSpawnNum = 15;
+	MinSpawnNum = 2;
+	MaxSpawnNum = 3;
 	PreviousMinutes = 0;
 	LocalElapsedTime = 0.0f;
-	bIsBossDead = false;
+	bIsGameEnded = false;
+	bIsTimesUp = false;
 	bIsPlayerDead = false;
 	bIsTimerRunning = false;
 	bIsPaused = false;
@@ -33,6 +35,13 @@ AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 
 void AShadow_of_the_DesertGameState::LocalStartGame()
 {
+	// 게임 종료 상태 확인 후 시간 복구
+	if (bIsGameEnded)
+	{
+		bIsGameEnded = false;
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+	}
+
 	// 게임 시작시 초기화
 	if (UShadow_of_the_DesertGameInstance* SOTDInstance = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
 	{
@@ -152,10 +161,26 @@ void AShadow_of_the_DesertGameState::SetHUDVisibility(bool bVisible)
 	}
 }
 
-void AShadow_of_the_DesertGameState::SpawnBoss()
+void AShadow_of_the_DesertGameState::SetDamage(int32 Damage)
 {
-	//보스 스폰 코드 작성
-	bIsBossDead = true;
+	if (UShadow_of_the_DesertGameInstance* SOTDInstance = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
+	{
+		SOTDInstance->TotalDamageDealt += Damage;
+	}
+}
+
+void AShadow_of_the_DesertGameState::SetTakenDamage(int32 Damage)
+{
+	if (UShadow_of_the_DesertGameInstance* SOTDInstance = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
+	{
+		SOTDInstance->TotalDamageTaken += Damage;
+	}
+}
+
+void AShadow_of_the_DesertGameState::CheckTimesUp()
+{
+	//제한시간 종료(나중에 보스를 만들면 그거 체크하는용도로도 가능)
+	bIsTimesUp = true;
 }
 
 void AShadow_of_the_DesertGameState::KillEnemy(int32 Score)
@@ -163,8 +188,8 @@ void AShadow_of_the_DesertGameState::KillEnemy(int32 Score)
 	RoundScore += Score;
 	KillEnemyCount++;
 
-	//게임 종료 조건 모든 몬스터랑 보스를 죽이면
-	if (bIsBossDead && KillEnemyCount >= AllEnemyCount)
+	//게임 종료 조건 제한시간 종료 후 모든 몬스터 처치 시
+	if (bIsTimesUp && KillEnemyCount >= AllEnemyCount)
 	{
 		GameEnd("Clear");
 	}
@@ -179,11 +204,11 @@ void AShadow_of_the_DesertGameState::KillEnemy(int32 Score)
 
 void AShadow_of_the_DesertGameState::EnemySpawn()
 {
-	// 보스 출현시간
-	if (LocalElapsedTime >= 60.0f)
+	// 버티는 시간 종료
+	if (LocalElapsedTime >= 180.0f)
 	{
-		// 보스 소환 후 몬스터 스폰 멈추기(지금은 끝나는거 구분만)
-		SpawnBoss();
+		// 시간 종료 체크 후 몬스터 스폰 멈추기
+		CheckTimesUp();
 		GetWorldTimerManager().ClearTimer(EnemyTimerHandle);
 
 		return;
@@ -269,13 +294,13 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 	if (HUDWidget)
 	{
 		// 진행 시간 표시
-		UTextBlock* TimeText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("TimeText")));
+		UTextBlock* TimeText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("WaveTimerTextBlock")));
 		if (TimeText)
 		{
 			int32 Minutes = static_cast<int32>(LocalElapsedTime) / 60;  // 분 계산
 			int32 Seconds = static_cast<int32>(LocalElapsedTime) % 60;  // 초 계산
 
-			TimeText->SetText(FText::FromString(FString::Printf(TEXT("Time: %02d:%02d"), Minutes, Seconds)));
+			TimeText->SetText(FText::FromString(FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds)));
 		}
 
 		UTextBlock* EnemyCountText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("EnemyCountText")));
@@ -376,15 +401,28 @@ void AShadow_of_the_DesertGameState::LocalReStartGame()
 		}
 	}
 
+	// 현재 존재하는 무기도 제거
+	TArray<AActor*> FoundWeapons;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWeaponBase::StaticClass(), FoundWeapons);
+
+	for (AActor* Weapons : FoundWeapons)
+	{
+		AWeaponBase* Weapon = Cast<AWeaponBase>(Weapons);
+		if (Weapon)
+		{
+			Weapon->Destroy();
+		}
+	}
+
 	// 게임 관련 변수 초기화
 	RoundScore = 0;
 	KillEnemyCount = 0;
 	AllEnemyCount = 0;
-	MinSpawnNum = 10;
-	MaxSpawnNum = 15;
+	MinSpawnNum = 2;
+	MaxSpawnNum = 3;
 	PreviousMinutes = 0;
 	LocalElapsedTime = 0.0f;
-	bIsBossDead = false;
+	bIsTimesUp = false;
 	bIsPlayerDead = false;
 	bIsTimerRunning = false;
 	bIsPaused = false;
@@ -407,6 +445,12 @@ void AShadow_of_the_DesertGameState::LocalReStartGame()
 
 void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 {
+	// 게임 종료 상태 설정
+	bIsGameEnded = true;
+
+	// 게임 내 모든 액터의 동작을 멈춤
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
+
 	GetWorldTimerManager().ClearTimer(GameTimerHandle);
 	GetWorldTimerManager().ClearTimer(HUDUpdateTimerHandle);
 
@@ -469,7 +513,7 @@ void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 					int32 Minutes = static_cast<int32>(LocalElapsedTime) / 60;  // 분 계산
 					int32 Seconds = static_cast<int32>(LocalElapsedTime) % 60;  // 초 계산
 
-					TimeText->SetText(FText::FromString(FString::Printf(TEXT("Time: %02d:%02d"), Minutes, Seconds)));
+					TimeText->SetText(FText::FromString(FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds)));
 				}
 
 				// 생존시간 점수 분당 1점

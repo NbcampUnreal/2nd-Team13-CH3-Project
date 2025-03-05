@@ -45,8 +45,8 @@ public:
 
 	
 
-	// 보스, 플레이어 사망 여부
-	bool bIsBossDead;
+	// 제한 시간 지났는지, 플레이어 사망 여부
+	bool bIsTimesUp;
 	bool bIsPlayerDead;
 	
 
@@ -75,12 +75,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GameFlow")
 	void LocalReStartGame();
 
-
-	void SetHUDVisibility(bool bVisible);
-	void SpawnBoss();
+	void SetDamage(int32 Damage);
+	void SetTakenDamage(int32 Damage);
+	void CheckTimesUp();
 	void KillEnemy(int32 Score);	// 적을 죽었을때
 	void EnemySpawn();
 	void TimerUpdate();
+	void SetHUDVisibility(bool bVisible);
 	void SetingHUD();
 	void UpdateHUD();
 	void GameEnd(FString Result);	// 게임 종료
@@ -91,6 +92,7 @@ protected:
 	
 private:
 	bool bIsTimerRunning;
+	bool bIsGameEnded;
 	int32 RoundScore;
 	UUserWidget* PauseMenuWidget;
 	UUserWidget* EndMenuWidget;
