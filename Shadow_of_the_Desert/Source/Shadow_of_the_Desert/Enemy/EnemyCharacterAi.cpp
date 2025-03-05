@@ -17,6 +17,8 @@ AEnemyCharacterAi::AEnemyCharacterAi()
 	scorePoint = 100;
 	attackSpeed = 0.5f;
 
+	isDead = false;
+
 	attackAnim = nullptr;
 	deadAnim = nullptr;
 
@@ -98,7 +100,7 @@ void AEnemyCharacterAi::DisableAttackCollision()
 void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 {
 	currentHp -= damage;
-	if (currentHp <= 0)
+	if (currentHp <= 0&&!isDead)
 	{
 		PlayDeadAnimation();
 		AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());		
@@ -106,6 +108,8 @@ void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 		{
 			gameState->KillEnemy(scorePoint);
 		}
+		UnpossessAI();
+		isDead = true;
 		FTimerHandle delayTime;
 		GetWorld()->GetTimerManager().SetTimer(delayTime, this, &AEnemyCharacterAi::EnemyDespawn, 5.0f, false);
 	}
@@ -156,4 +160,14 @@ float AEnemyCharacterAi::GetAtkPower()
 {
 //	UE_LOG(LogTemp, Warning, TEXT("%.2f"), attackPower);
 	return attackPower;
+}
+
+void AEnemyCharacterAi::UnpossessAI()
+{
+	AAIController* aiCtl = Cast<AAIController>(GetController());
+
+	if (aiCtl)
+	{
+		aiCtl->UnPossess();
+	}
 }
