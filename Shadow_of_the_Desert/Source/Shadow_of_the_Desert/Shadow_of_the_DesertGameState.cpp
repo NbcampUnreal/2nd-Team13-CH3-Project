@@ -335,7 +335,18 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 			if (PlayerDamageText)
 			{
 				int32 PlayerDamage = SOTDInstance->TotalDamageDealt;
-				PlayerDamageText->SetText(FText::FromString(FString::Printf(TEXT("%d"), PlayerDamage)));
+				FString DamageText;
+
+				if (PlayerDamage >= 1000) // 1000 이상이면 "1.0K" 형식으로 표시
+				{
+					DamageText = FString::Printf(TEXT("%.1fK"), PlayerDamage / 1000.0f);
+				}
+				else // 1000 미만이면 그대로 숫자로 표시
+				{
+					DamageText = FString::Printf(TEXT("%d"), PlayerDamage);
+				}
+
+				PlayerDamageText->SetText(FText::FromString(DamageText));
 			}
 		}
 
@@ -347,16 +358,20 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 			UImage* SniperImage = Cast<UImage>(HUDWidget->GetWidgetFromName(TEXT("SniperRifleImage")));
 			UImage* RocketImage = Cast<UImage>(HUDWidget->GetWidgetFromName(TEXT("RPGImage")));
 
+			// 총알 표기 상자
 			UTextBlock* CurrentAmmoTextBox = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("CurrentAmmoTextBox")));
 			UTextBlock* MaxAmmoTextBlock = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("MaxAmmoTextBlock")));
-
+			
 			// 모든 무기 UI를 숨김
 			if (RifleImage) RifleImage->SetVisibility(ESlateVisibility::Hidden);
 			if (SniperImage) SniperImage->SetVisibility(ESlateVisibility::Hidden);
 			if (RocketImage) RocketImage->SetVisibility(ESlateVisibility::Hidden);
 			
-			// 현재 장착된 무기에 따라 해당 이미지만 보이도록 설정
-			if (PlayerCharacter->Ues_Rifle_now && RifleImage)
+			// 현재 무기의 정보 가져오기
+			AWeaponBase* CurrentWeapon = PlayerCharacter->GetEquippedWeapon();
+
+			// 현재 장착된 무기에 따라 맞는 HUD 출력
+			if (PlayerCharacter->Ues_Rifle_now && RifleImage&&CurrentWeapon)
 			{
 				RifleImage->SetVisibility(ESlateVisibility::Visible);
 
@@ -365,7 +380,7 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 				CurrentAmmoTextBox->SetText(FText::FromString(FString::Printf(TEXT("%d"), CurrentAmmo)));
 				MaxAmmoTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), MaxAmmo)));
 			}
-			else if (PlayerCharacter->Ues_Sniper_now && SniperImage)
+			else if (PlayerCharacter->Ues_Sniper_now&&SniperImage&&CurrentWeapon)
 			{
 				SniperImage->SetVisibility(ESlateVisibility::Visible);
 
@@ -374,7 +389,7 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 				CurrentAmmoTextBox->SetText(FText::FromString(FString::Printf(TEXT("%d"), CurrentAmmo)));
 				MaxAmmoTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), MaxAmmo)));
 			}
-			else if (PlayerCharacter->Ues_Rocket_now && RocketImage)
+			else if (PlayerCharacter->Ues_Rocket_now&&RocketImage&&CurrentWeapon)
 			{
 				RocketImage->SetVisibility(ESlateVisibility::Visible);
 
