@@ -346,3 +346,7 @@ void AShadow_of_the_DesertCharacter::EquipWeapon(TSubclassOf<AWeaponBase> Weapon
 		}
 	}
 }
+
+AWeaponBase* AShadow_of_the_DesertCharacter::GetEquippedWeapon() {
+	return EquippedWeapon;
+}
