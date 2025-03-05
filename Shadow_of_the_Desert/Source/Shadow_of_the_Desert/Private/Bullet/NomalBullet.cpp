@@ -2,7 +2,7 @@
 
 ANomalBullet::ANomalBullet()
 {
-	Speed = 1000.0f;
+	Speed = 3000.0f;
 	BulletDamage = 0.0f;
 }
 
@@ -27,7 +27,7 @@ void ANomalBullet::OnHit(
 				HitEnemy->EnemyTakeDamage(BulletDamage);
 			}
 			Destroy();
-			UE_LOG(LogTemp, Warning, TEXT("Damage Applied: %.2f"), BulletDamage); // [[4]](#__4)
+			UE_LOG(LogTemp, Warning, TEXT("Damage Applied: %.2f"), BulletDamage);
 		}
 		else
 		{

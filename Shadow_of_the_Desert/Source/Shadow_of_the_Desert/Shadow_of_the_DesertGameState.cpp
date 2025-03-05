@@ -35,14 +35,14 @@ AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 
 void AShadow_of_the_DesertGameState::LocalStartGame()
 {
-	// °ÔÀÓ Á¾·á »óÅÂ È®ÀÎ ÈÄ ½Ã°£ º¹±¸
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (bIsGameEnded)
 	{
 		bIsGameEnded = false;
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
 	}
 
-	// °ÔÀÓ ½ÃÀÛ½Ã ÃÊ±âÈ­
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Û½ï¿½ ï¿½Ê±ï¿½È­
 	if (UShadow_of_the_DesertGameInstance* SOTDInstance = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
 	{
 		SOTDInstance->TotalScore = 0;
@@ -50,16 +50,16 @@ void AShadow_of_the_DesertGameState::LocalStartGame()
 		SOTDInstance->TotalDamageTaken = 0.0f;
 	}
 
-	// °ÔÀÓ Å¸ÀÌ¸Ó ½ÃÀÛ
+	// ê²Œì„ íƒ€ì´ë¨¸ ì‹œì‘
 	if (!bIsTimerRunning)
 	{
 		bIsTimerRunning = true;
 
-		// 1ÃÊ¸¶´Ù UpdateTimer ÇÔ¼ö ½ÇÇà
+		// 1ì´ˆë§ˆë‹¤ UpdateTimer í•¨ìˆ˜ ì‹¤í–‰
 		GetWorldTimerManager().SetTimer(GameTimerHandle, this, &AShadow_of_the_DesertGameState::TimerUpdate, 1.f, true);
 	}
 
-	// °ÔÀÓ ½ÃÀÛ½Ã HUD À§Á¬ »ı¼º ¹× Ãß°¡
+	// ê²Œì„ ì‹œì‘ì‹œ HUD ìœ„ì ¯ ìƒì„± ë° ì¶”ê°€
 	SetingHUD();
 	if (HUDWidgetClass)
 	{
@@ -70,7 +70,7 @@ void AShadow_of_the_DesertGameState::LocalStartGame()
 		}
 	}
 
-	//UI ¾÷µ¥ÀÌÆ®
+	//UI ì—…ë°ì´íŠ¸
 	GetWorldTimerManager().SetTimer(
 		HUDUpdateTimerHandle,
 		this,
@@ -78,16 +78,16 @@ void AShadow_of_the_DesertGameState::LocalStartGame()
 		0.1f,
 		true);
 
-	// ¸ŞÀÎ¸Ş´º ´İ±â
+	// ë©”ì¸ë©”ë‰´ ë‹«ê¸°
 	if (AShadow_of_the_DesertGameMode* GameMode = Cast<AShadow_of_the_DesertGameMode>(UGameplayStatics::GetGameMode(this)))
 	{
 		GameMode->CloseMainMenu();
 	}
 
-	//Ã¹½ºÆù
+	//ì²«ìŠ¤í°
 	EnemySpawn();
 
-	//±× ÀÌÈÄ 10ÃÊ¸¶´Ù ½ºÆù false¿¡¼­ true·Î ¹Ù²ãÁÖ¸éµÊ
+	//ê·¸ ì´í›„ 10ì´ˆë§ˆë‹¤ ìŠ¤í° falseì—ì„œ trueë¡œ ë°”ê¿”ì£¼ë©´ë¨
 	GetWorldTimerManager().SetTimer(
 		EnemyTimerHandle,
 		this,
@@ -98,18 +98,18 @@ void AShadow_of_the_DesertGameState::LocalStartGame()
 
 void AShadow_of_the_DesertGameState::LocalPauseGame()
 {
-	// Pause Menu »ı¼º ¹× È­¸é¿¡ Ãß°¡
+	// Pause Menu ìƒì„± ë° í™”ë©´ì— ì¶”ê°€
 	if (PauseMenuWidgetClass && PauseMenuWidget == nullptr)
 	{
 		PauseMenuWidget = CreateWidget<UUserWidget>(GetWorld(), PauseMenuWidgetClass);
 		if (PauseMenuWidget)
 		{
-			// HUD ¼û±â±â
+			// HUD ìˆ¨ê¸°ê¸°
 			SetHUDVisibility(false);
 
 			PauseMenuWidget->AddToViewport();
 
-			// UI ¸ğµå·Î º¯°æ
+			// UI ëª¨ë“œë¡œ ë³€ê²½
 			if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
 			{
 				GetWorldTimerManager().PauseTimer(GameTimerHandle);
@@ -134,19 +134,19 @@ void AShadow_of_the_DesertGameState::LocalResumeGame()
 		GetWorldTimerManager().UnPauseTimer(GameTimerHandle);
 		bIsPaused = false;
 
-		// °ÔÀÓ ¸ğµå·Î º¯°æ
+		// ê²Œì„ ëª¨ë“œë¡œ ë³€ê²½
 		FInputModeGameOnly InputMode;
 		PlayerController->SetInputMode(InputMode);
 		PlayerController->bShowMouseCursor = false;
 	}
 
-	// Pause Menu Á¦°Å
+	// Pause Menu ì œê±°
 	if (PauseMenuWidget)
 	{
 		PauseMenuWidget->RemoveFromParent();
 		PauseMenuWidget = nullptr;
 
-		// HUD ´Ù½Ã Ç¥½Ã
+		// HUD ë‹¤ì‹œ í‘œì‹œ
 		SetHUDVisibility(true);
 	}
 }
@@ -155,7 +155,7 @@ void AShadow_of_the_DesertGameState::SetHUDVisibility(bool bVisible)
 {
 	if (HUDWidget)
 	{
-		// HUDÀÇ °¡½Ã¼ºÀ» Á¶Àı
+		// HUDì˜ ê°€ì‹œì„±ì„ ì¡°ì ˆ
 		ESlateVisibility VisibilityState = bVisible ? ESlateVisibility::Visible : ESlateVisibility::Hidden;
 		HUDWidget->SetVisibility(VisibilityState);
 	}
@@ -179,7 +179,7 @@ void AShadow_of_the_DesertGameState::SetTakenDamage(int32 Damage)
 
 void AShadow_of_the_DesertGameState::CheckTimesUp()
 {
-	//Á¦ÇÑ½Ã°£ Á¾·á(³ªÁß¿¡ º¸½º¸¦ ¸¸µé¸é ±×°Å Ã¼Å©ÇÏ´Â¿ëµµ·Îµµ °¡´É)
+	//ï¿½ï¿½ï¿½Ñ½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ß¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×°ï¿½ Ã¼Å©ï¿½Ï´Â¿ëµµï¿½Îµï¿½ ï¿½ï¿½ï¿½ï¿½)
 	bIsTimesUp = true;
 }
 
@@ -188,7 +188,7 @@ void AShadow_of_the_DesertGameState::KillEnemy(int32 Score)
 	RoundScore += Score;
 	KillEnemyCount++;
 
-	//°ÔÀÓ Á¾·á Á¶°Ç Á¦ÇÑ½Ã°£ Á¾·á ÈÄ ¸ğµç ¸ó½ºÅÍ Ã³Ä¡ ½Ã
+	//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ñ½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã³Ä¡ ï¿½ï¿½
 	if (bIsTimesUp && KillEnemyCount >= AllEnemyCount)
 	{
 		GameEnd("Clear");
@@ -204,26 +204,26 @@ void AShadow_of_the_DesertGameState::KillEnemy(int32 Score)
 
 void AShadow_of_the_DesertGameState::EnemySpawn()
 {
-	// ¹öÆ¼´Â ½Ã°£ Á¾·á
+	// ï¿½ï¿½Æ¼ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½
 	if (LocalElapsedTime >= 180.0f)
 	{
-		// ½Ã°£ Á¾·á Ã¼Å© ÈÄ ¸ó½ºÅÍ ½ºÆù ¸ØÃß±â
+		// ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã¼Å© ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ß±ï¿½
 		CheckTimesUp();
 		GetWorldTimerManager().ClearTimer(EnemyTimerHandle);
 
 		return;
 	}
 
-	// Min~Max ·£´ı ¼ıÀÚ¸¸Å­ ½ºÆù½ÃÅ°±â
+	// Min~Max ëœë¤ ìˆ«ìë§Œí¼ ìŠ¤í°ì‹œí‚¤ê¸°
 	int32 RandomSpawn = FMath::RandRange(MinSpawnNum, MaxSpawnNum);
 	AEnemySpawner* EnemySpawner = Cast<AEnemySpawner>(UGameplayStatics::GetActorOfClass(this, AEnemySpawner::StaticClass()));
 
-	// ½ºÆ÷³Ê ¹èÄ¡µÇ¾îÀÖ´ÂÁö È®ÀÎ(³ªÁß¿¡ »©µµ µÇ´Â ÄÚµå?)
+	// ìŠ¤í¬ë„ˆ ë°°ì¹˜ë˜ì–´ìˆëŠ”ì§€ í™•ì¸(ë‚˜ì¤‘ì— ë¹¼ë„ ë˜ëŠ” ì½”ë“œ?)
 	if (!EnemySpawner)
 	{
 		return;
 	}
-	// ¸ó½ºÅÍ ½ºÆù
+	// ëª¬ìŠ¤í„° ìŠ¤í°
 	for (size_t i = 0; i < RandomSpawn; i++)
 	{
 		EnemySpawner->EnemySpawn();
@@ -233,12 +233,12 @@ void AShadow_of_the_DesertGameState::EnemySpawn()
 
 void AShadow_of_the_DesertGameState::TimerUpdate()
 {
-	// °ÔÀÓÀÌ ÀÏ½ÃÁ¤Áö ÁßÀÌ ¾Æ´Ï¶ó¸é °æ°ú ½Ã°£ 1ÃÊ¾¿ ´©Àû
+	// ê²Œì„ì´ ì¼ì‹œì •ì§€ ì¤‘ì´ ì•„ë‹ˆë¼ë©´ ê²½ê³¼ ì‹œê°„ 1ì´ˆì”© ëˆ„ì 
 	if (!bIsPaused)
 	{
 		LocalElapsedTime += 1.0f;
 
-		// ºĞ¸¶´Ù ³­ÀÌµµ ¿Ã¶ó°¡°Ô²û?
+		// ë¶„ë§ˆë‹¤ ë‚œì´ë„ ì˜¬ë¼ê°€ê²Œë”?
 		int CurrentMinutes = FMath::FloorToInt(LocalElapsedTime / 60.0f);
 
 		if (CurrentMinutes > PreviousMinutes)
@@ -253,19 +253,19 @@ void AShadow_of_the_DesertGameState::TimerUpdate()
 
 void AShadow_of_the_DesertGameState::SetingHUD()
 {
-	// ÇöÀç »ç¿ë ÁßÀÎ GameMode °¡Á®¿À±â
+	// í˜„ì¬ ì‚¬ìš© ì¤‘ì¸ GameMode ê°€ì ¸ì˜¤ê¸°
 	AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
 	if (GameMode)
 	{
-		// GameMode¿¡¼­ ¼³Á¤ÇÑ HUDClass(BP_CustomHUD)¸¦ °¡Á®¿À±â
+		// GameModeì—ì„œ ì„¤ì •í•œ HUDClass(BP_CustomHUD)ë¥¼ ê°€ì ¸ì˜¤ê¸°
 		TSubclassOf<AHUD> HUDClass = GameMode->HUDClass;
 		if (HUDClass)
 		{
-			// BP_CustomHUD¸¦ ¼öµ¿À¸·Î »ı¼º
+			// BP_CustomHUDë¥¼ ìˆ˜ë™ìœ¼ë¡œ ìƒì„±
 			HUDInstance = GetWorld()->SpawnActor<AHUD>(HUDClass);
 			if (HUDInstance)
 			{
-				// BP_CustomHUD¿¡¼­ HUDWidgetClass °¡Á®¿À±â
+				// BP_CustomHUDì—ì„œ HUDWidgetClass ê°€ì ¸ì˜¤ê¸°
 				HUDWidgetClass = nullptr;
 				UObject* HUDObject = Cast<UObject>(HUDInstance);
 
@@ -293,12 +293,12 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 {
 	if (HUDWidget)
 	{
-		// ÁøÇà ½Ã°£ Ç¥½Ã
+		// ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ Ç¥ï¿½ï¿½
 		UTextBlock* TimeText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("WaveTimerTextBlock")));
 		if (TimeText)
 		{
-			int32 Minutes = static_cast<int32>(LocalElapsedTime) / 60;  // ºĞ °è»ê
-			int32 Seconds = static_cast<int32>(LocalElapsedTime) % 60;  // ÃÊ °è»ê
+			int32 Minutes = static_cast<int32>(LocalElapsedTime) / 60;  // ë¶„ ê³„ì‚°
+			int32 Seconds = static_cast<int32>(LocalElapsedTime) % 60;  // ì´ˆ ê³„ì‚°
 
 			TimeText->SetText(FText::FromString(FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds)));
 		}
@@ -317,7 +317,7 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 			EnemyKillCountText->SetText(FText::FromString(FString::Printf(TEXT("%d"), KillEnemyCount)));
 		}
 
-		// ÇÃ·¹ÀÌ¾î µ¥¹ÌÁö
+		// í”Œë ˆì´ì–´ ë°ë¯¸ì§€
 		if (UShadow_of_the_DesertGameInstance* SOTDInstance = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
 		{
 			UTextBlock* PlayerDamageText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("PlayerDamageText")));
@@ -328,7 +328,7 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 			}
 		}
 
-		// ÇöÀç ÇÃ·¹ÀÌ¾î ÄÁÆ®·Ñ·¯¸¦ ÅëÇØ Á¶Á¾ ÁßÀÎ Ä³¸¯ÅÍ °¡Á®¿À±â
+		// í˜„ì¬ í”Œë ˆì´ì–´ ì»¨íŠ¸ë¡¤ëŸ¬ë¥¼ í†µí•´ ì¡°ì¢… ì¤‘ì¸ ìºë¦­í„° ê°€ì ¸ì˜¤ê¸°
 		ACharacter* PlayerCharacter = Cast<ACharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
 		if (PlayerCharacter)
@@ -337,9 +337,14 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 
 			if (MyCharacter)
 			{
-				//Ã¼·Â
+				//ì²´ë ¥
+				static float CurrentHealth = MyCharacter->GetHelth(); // ì´ì „ í”„ë ˆì„ì—ì„œì˜ ì²´ë ¥ ì €ì¥
 				int32 PlayerHP = MyCharacter->GetHelth();
 				int32 MaxHP = MyCharacter->GetMaxHelth();
+
+				// ì²´ë ¥ ë³´ê°„ (ë¶€ë“œëŸ½ê²Œ ê°ì†Œ)
+				float InterpSpeed = 5.0f;  // ë³´ê°„ ì†ë„ ì¡°ì ˆ ê°€ëŠ¥
+				CurrentHealth = FMath::FInterpTo(CurrentHealth, PlayerHP, GetWorld()->GetDeltaSeconds(), InterpSpeed);
 
 				UTextBlock* PlayerHealthTextBlock = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("PlayerHealthTextBlock")));
 				UTextBlock* PlayerMaxHealthTextBlock = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("PlayerMaxHealthTextBlock")));
@@ -348,20 +353,20 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 					PlayerHealthTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), PlayerHP)));
 					PlayerMaxHealthTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), MaxHP)));
 				}
-				// Ã¼·Â¹Ù
+				// ì²´ë ¥ë°”
 				UProgressBar* HealthBar = Cast<UProgressBar>(HUDWidget->GetWidgetFromName(TEXT("PlayerHealthProgressBar")));
 				if (HealthBar)
 				{
-					float HPPercent = static_cast<float>(PlayerHP) / MaxHP;
+					float HPPercent = CurrentHealth / MaxHP;
 					HealthBar->SetPercent(HPPercent);
 				}
-				
-				//°æÇèÄ¡¹Ù
+
+				//ê²½í—˜ì¹˜ë°”
 
 				/*UProgressBar* ExpBar = Cast<UProgressBar>(HUDWidget->GetWidgetFromName(TEXT("LevelProgressBar")));
 				if (ExpBar)
 				{
-					°æÇèÄ¡·Î ¹Ù²ãÁà¾ßµÊ
+					ê²½í—˜ì¹˜ë¡œ ë°”ê¿”ì¤˜ì•¼ë¨
 					float ExpPercent = static_cast<float>(PlayerHP) / MaxHP;
 					ExpBar->SetPercent(HPPercent);
 				}*/
@@ -372,11 +377,11 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 
 void AShadow_of_the_DesertGameState::LocalResetGame()
 {
-	// ÇöÀç ½ÇÇà ÁßÀÎ ¸Ê ÀÌ¸§ °¡Á®¿À±â
+	// í˜„ì¬ ì‹¤í–‰ ì¤‘ì¸ ë§µ ì´ë¦„ ê°€ì ¸ì˜¤ê¸°
 	FString CurrentLevelName = GetWorld()->GetMapName();
-	CurrentLevelName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix); // ÇÊ¿äÇÒ °æ¿ì Á¢µÎ»ç Á¦°Å
+	CurrentLevelName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix); // í•„ìš”í•  ê²½ìš° ì ‘ë‘ì‚¬ ì œê±°
 
-	// ÇöÀç ¸Ê ´Ù½Ã ·Îµå
+	// í˜„ì¬ ë§µ ë‹¤ì‹œ ë¡œë“œ
 	UGameplayStatics::OpenLevel(this, FName(*CurrentLevelName));
 }
 
@@ -385,10 +390,10 @@ void AShadow_of_the_DesertGameState::LocalReStartGame()
 	if (EndMenuWidget)
 	{
 		EndMenuWidget->RemoveFromParent();
-		EndMenuWidget = nullptr; // Æ÷ÀÎÅÍ ÃÊ±âÈ­
+		EndMenuWidget = nullptr; // í¬ì¸í„° ì´ˆê¸°í™”
 	}
 
-	// ÇöÀç Á¸ÀçÇÏ´Â Àûµé¸¸ Á¦°Å
+	// í˜„ì¬ ì¡´ì¬í•˜ëŠ” ì ë“¤ë§Œ ì œê±°
 	TArray<AActor*> FoundEnemies;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyCharacterAi::StaticClass(), FoundEnemies);
 
@@ -401,7 +406,7 @@ void AShadow_of_the_DesertGameState::LocalReStartGame()
 		}
 	}
 
-	// ÇöÀç Á¸ÀçÇÏ´Â ¹«±âµµ Á¦°Å
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½âµµ ï¿½ï¿½ï¿½ï¿½
 	TArray<AActor*> FoundWeapons;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWeaponBase::StaticClass(), FoundWeapons);
 
@@ -414,7 +419,7 @@ void AShadow_of_the_DesertGameState::LocalReStartGame()
 		}
 	}
 
-	// °ÔÀÓ °ü·Ã º¯¼ö ÃÊ±âÈ­
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
 	RoundScore = 0;
 	KillEnemyCount = 0;
 	AllEnemyCount = 0;
@@ -428,40 +433,40 @@ void AShadow_of_the_DesertGameState::LocalReStartGame()
 	bIsPaused = false;
 
 
-	// ÇÃ·¹ÀÌ¾î »óÅÂ ÃÊ±âÈ­
+	// í”Œë ˆì´ì–´ ìƒíƒœ ì´ˆê¸°í™”
 	AShadow_of_the_DesertGameMode* GameMode = Cast<AShadow_of_the_DesertGameMode>(UGameplayStatics::GetGameMode(this));
 	if (GameMode)
 	{
 		GameMode->RestartGame();
 	}
 
-	// Å¸ÀÌ¸Ó ¸®¼Â
+	// íƒ€ì´ë¨¸ ë¦¬ì…‹
 	GetWorldTimerManager().ClearTimer(GameTimerHandle);
 	GetWorldTimerManager().ClearTimer(EnemyTimerHandle);
 
-	// °ÔÀÓ ½ÃÀÛ
+	// ê²Œì„ ì‹œì‘
 	LocalStartGame();
 }
 
 void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 {
-	// °ÔÀÓ Á¾·á »óÅÂ ¼³Á¤
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	bIsGameEnded = true;
 
-	// °ÔÀÓ ³» ¸ğµç ¾×ÅÍÀÇ µ¿ÀÛÀ» ¸ØÃã
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
 
 	GetWorldTimerManager().ClearTimer(GameTimerHandle);
 	GetWorldTimerManager().ClearTimer(HUDUpdateTimerHandle);
 
-	// °ÔÀÓ Á¾·á½Ã HUD Á¦°Å
+	// ê²Œì„ ì¢…ë£Œì‹œ HUD ì œê±°
 	if (HUDWidget)
 	{
 		HUDWidget->RemoveFromParent();
-		HUDWidget = nullptr; // Æ÷ÀÎÅÍ ÃÊ±âÈ­
+		HUDWidget = nullptr; // í¬ì¸í„° ì´ˆê¸°í™”
 	}
 
-	// °ÔÀÓ Á¾·á UI »ı¼º ¹× Ç¥½Ã
+	// ê²Œì„ ì¢…ë£Œ UI ìƒì„± ë° í‘œì‹œ
 	if (EndMenuWidgetClass && EndMenuWidget == nullptr)
 	{
 		EndMenuWidget = CreateWidget<UUserWidget>(GetWorld(), EndMenuWidgetClass);
@@ -469,7 +474,7 @@ void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 		{
 			EndMenuWidget->AddToViewport();
 
-			// UI ¸ğµå·Î º¯°æ
+			// UI ëª¨ë“œë¡œ ë³€ê²½
 			if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
 			{
 				FInputModeUIOnly InputMode;
@@ -479,7 +484,7 @@ void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 				PlayerController->SetInputMode(InputMode);
 			}
 
-			// ½Â¸® ÆĞ¹è½Ã ¹Ù²î´Â°ªÀº ¿©±â´Ù°¡
+			// ìŠ¹ë¦¬ íŒ¨ë°°ì‹œ ë°”ë€ŒëŠ”ê°’ì€ ì—¬ê¸°ë‹¤ê°€
 			if (Result == "Clear")
 			{
 				UWidget* DefeatLogo = EndMenuWidget->GetWidgetFromName(TEXT("DefeatLogo"));
@@ -488,14 +493,14 @@ void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 				UWidget* DefeatBorder = EndMenuWidget->GetWidgetFromName(TEXT("DefeatBorder"));
 				UWidget* VictoryBorder = EndMenuWidget->GetWidgetFromName(TEXT("VictoryBorder"));
 
-				// Logo´Â ¿©±â
+				// LogoëŠ” ì—¬ê¸°
 				if (DefeatLogo && VictoryLogo)
 				{
 					DefeatLogo->SetVisibility(ESlateVisibility::Hidden);
 					VictoryLogo->SetVisibility(ESlateVisibility::Visible);
 				}
 
-				// Border´Â ¿©±â
+				// BorderëŠ” ì—¬ê¸°
 				if (DefeatBorder && VictoryBorder)
 				{
 					DefeatBorder->SetVisibility(ESlateVisibility::Hidden);
@@ -505,18 +510,18 @@ void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 
 			if (UShadow_of_the_DesertGameInstance* SOTDInstance = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
 			{
-				
-				// ÁøÇà ½Ã°£ Ç¥½Ã
+
+				// ì§„í–‰ ì‹œê°„ í‘œì‹œ
 				UTextBlock* TimeText = Cast<UTextBlock>(EndMenuWidget->GetWidgetFromName(TEXT("TimeText")));
 				if (TimeText)
 				{
-					int32 Minutes = static_cast<int32>(LocalElapsedTime) / 60;  // ºĞ °è»ê
-					int32 Seconds = static_cast<int32>(LocalElapsedTime) % 60;  // ÃÊ °è»ê
+					int32 Minutes = static_cast<int32>(LocalElapsedTime) / 60;  // ë¶„ ê³„ì‚°
+					int32 Seconds = static_cast<int32>(LocalElapsedTime) % 60;  // ì´ˆ ê³„ì‚°
 
 					TimeText->SetText(FText::FromString(FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds)));
 				}
 
-				// »ıÁ¸½Ã°£ Á¡¼ö ºĞ´ç 1Á¡
+				// ìƒì¡´ì‹œê°„ ì ìˆ˜ ë¶„ë‹¹ 1ì 
 				UTextBlock* TimeScoreText = Cast<UTextBlock>(EndMenuWidget->GetWidgetFromName(TEXT("TimeScoreText")));
 				if (TimeScoreText)
 				{
@@ -525,14 +530,14 @@ void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 					TimeScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), TimeScore)));
 				}
 
-				//Ã³Ä¡ ¼ö
+				//ì²˜ì¹˜ ìˆ˜
 				UTextBlock* KillCountTextBlock = Cast<UTextBlock>(EndMenuWidget->GetWidgetFromName(TEXT("KillCountTextBlock")));
 				if (KillCountTextBlock)
 				{
 					KillCountTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), KillEnemyCount)));
 				}
 
-				//Á¡¼ö
+				//ì ìˆ˜
 				UTextBlock* ScoreText = Cast<UTextBlock>(EndMenuWidget->GetWidgetFromName(TEXT("ScoreText")));
 				if (ScoreText)
 				{
@@ -541,7 +546,7 @@ void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 					ScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), Score)));
 				}
 
-				// ÃÑ µ¥¹ÌÁö(ÀÔÈù ÇÇÇØ)
+				// ì´ ë°ë¯¸ì§€(ì…íŒ í”¼í•´)
 				UTextBlock* DamageText = Cast<UTextBlock>(EndMenuWidget->GetWidgetFromName(TEXT("DamageText")));
 				UTextBlock* DamageScoreText = Cast<UTextBlock>(EndMenuWidget->GetWidgetFromName(TEXT("DamageScoreText")));
 				if (DamageText && DamageScoreText)
@@ -552,7 +557,7 @@ void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 					DamageScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), TotalDamage)));
 				}
 
-				// ÃÑ ÀÔÀº ÇÇÇØ
+				// ì´ ì…ì€ í”¼í•´
 				UTextBlock* TakenDamageText = Cast<UTextBlock>(EndMenuWidget->GetWidgetFromName(TEXT("TakenDamageText")));
 				UTextBlock* TakenDamageScoreText = Cast<UTextBlock>(EndMenuWidget->GetWidgetFromName(TEXT("TakenDamageScoreText")));
 				if (TakenDamageText && TakenDamageScoreText)
@@ -563,7 +568,7 @@ void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 					TakenDamageScoreText->SetText(FText::FromString(FString::Printf(TEXT("%d"), TotalTakenDamage)));
 				}
 
-				// ÃÑÁ¡
+				// ì´ì 
 				UTextBlock* TotalScoreText = Cast<UTextBlock>(EndMenuWidget->GetWidgetFromName(TEXT("TotalScoreText")));
 				if (TotalScoreText)
 				{
@@ -579,7 +584,7 @@ void AShadow_of_the_DesertGameState::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+
 }
 
 

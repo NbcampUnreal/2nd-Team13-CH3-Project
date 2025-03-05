@@ -49,6 +49,7 @@ public:
 	void PlayDeadAnimation();
 
 	float GetAtkPower();
+	void UnpossessAI();
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy|Status")
 	float maxHp;
@@ -60,6 +61,7 @@ protected:
 	int32 scorePoint;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Status")
 	float attackSpeed;
+	bool isDead;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Animation")
 	UAnimSequence* attackAnim;
