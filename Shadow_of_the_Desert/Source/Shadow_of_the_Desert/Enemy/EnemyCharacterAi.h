@@ -42,6 +42,8 @@ public:
 	void ActivateAttackCollision();
 	UFUNCTION(BlueprintCallable)
 	void DisableAttackCollision();
+	UFUNCTION(BlueprintCallable)
+	void ShowDamageText(int32 Damage);
 
 	UFUNCTION(BlueprintCallable)
 	void PlayAttackAnimation();
@@ -62,6 +64,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Status")
 	float attackSpeed;
 	bool isDead;
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<class UDamageTextWidget> DamageTextWidgetClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Animation")
 	UAnimSequence* attackAnim;
@@ -72,4 +76,6 @@ protected:
 	USphereComponent* attackCollision;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Collision")
 	UCapsuleComponent* hitBoxCollision;
+
+	virtual void BeginPlay() override;
 };
