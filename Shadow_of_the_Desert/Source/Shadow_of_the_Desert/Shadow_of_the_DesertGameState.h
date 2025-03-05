@@ -75,6 +75,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GameFlow")
 	void LocalReStartGame();
 
+	UFUNCTION(BlueprintCallable, Category = "GameFlow")
+	void GoMainMenu();
+
 	void SetDamage(int32 Damage);
 	void SetTakenDamage(int32 Damage);
 	void CheckTimesUp();
@@ -93,6 +96,7 @@ protected:
 private:
 	bool bIsTimerRunning;
 	bool bIsGameEnded;
+	int32 WaveCount;
 	int32 RoundScore;
 	UUserWidget* PauseMenuWidget;
 	UUserWidget* EndMenuWidget;

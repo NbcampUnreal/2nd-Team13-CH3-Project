@@ -100,18 +100,19 @@ void AEnemyCharacterAi::DisableAttackCollision()
 void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 {
 	currentHp -= damage;
-	if (currentHp <= 0&&!isDead)
+	AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());
+	if (gameState)
 	{
-		PlayDeadAnimation();
-		AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());		
-		if (gameState)
+		gameState->SetDamage(damage);
+		if (currentHp <= 0&&!isDead)
 		{
+			PlayDeadAnimation();
 			gameState->KillEnemy(scorePoint);
+			UnpossessAI();
+			isDead = true;
+			FTimerHandle delayTime;
+			GetWorld()->GetTimerManager().SetTimer(delayTime, this, &AEnemyCharacterAi::EnemyDespawn, 5.0f, false);
 		}
-		UnpossessAI();
-		isDead = true;
-		FTimerHandle delayTime;
-		GetWorld()->GetTimerManager().SetTimer(delayTime, this, &AEnemyCharacterAi::EnemyDespawn, 5.0f, false);
 	}
 }
 
