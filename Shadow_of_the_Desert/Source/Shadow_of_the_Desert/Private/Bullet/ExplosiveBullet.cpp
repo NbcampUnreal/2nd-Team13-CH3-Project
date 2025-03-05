@@ -6,7 +6,7 @@
 
 AExplosiveBullet::AExplosiveBullet()
 {
-    Speed = 200.0f;
+    Speed = 1000.0f;
     ExplosionRadius = 500.0f; // 폭발 범위
     BulletDamage = 0;   // 폭발 데미지
 }
@@ -98,7 +98,7 @@ void AExplosiveBullet::OnHit(
         }
     }
 }*/
-void AExplosiveBullet::Explode(FVector Location)
+/*void AExplosiveBullet::Explode(FVector Location)
 {
     TArray<AActor*> IgnoredActors;
 
@@ -147,7 +147,7 @@ void AExplosiveBullet::Explode(FVector Location)
     // 디버그 로그
     UE_LOG(LogTemp, Warning, TEXT("Damage Applied: %.2f"), BulletDamage);
     DrawDebugSphere(GetWorld(), Location, ExplosionRadius, 12, FColor::Red, false, 3.0f);
-}
+}*/
 
 
 /*
@@ -208,3 +208,46 @@ void AExplosiveBullet::Explode(FVector Location)
     }
 }
 */
+
+void AExplosiveBullet::Explode(FVector Location)
+{
+    TArray<AActor*> IgnoredActors;
+
+    // 1. 무시할 액터 설정 (플레이어와 발사자)
+    if (APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
+    {
+        IgnoredActors.AddUnique(PlayerPawn);
+    }
+
+    if (AActor* InstigatorActor = GetInstigator())
+    {
+        IgnoredActors.AddUnique(InstigatorActor);
+    }
+
+    // 2. 범위 내 모든 AEnemyCharacterAi 찾기
+    TArray<AActor*> AllEnemies;
+    UGameplayStatics::GetAllActorsOfClass(
+        GetWorld(),
+        AEnemyCharacterAi::StaticClass(),
+        AllEnemies
+    );
+
+    // 3. 범위 내 적에게 직접 EnemyTakeDamage 호출
+    for (AActor* Enemy : AllEnemies)
+    {
+        if (Enemy &&
+            FVector::Dist(Enemy->GetActorLocation(), Location) <= ExplosionRadius)
+        {
+            if (AEnemyCharacterAi* EnemyChar = Cast<AEnemyCharacterAi>(Enemy))
+            {
+                // 적 클래스의 EnemyTakeDamage 직접 호출
+                EnemyChar->EnemyTakeDamage(BulletDamage);
+                UE_LOG(LogTemp, Warning, TEXT("Enemy %s took damage"), *EnemyChar->GetName());
+            }
+        }
+    }
+
+    // 4. 디버그 및 이펙트 처리
+    DrawDebugSphere(GetWorld(), Location, ExplosionRadius, 12, FColor::Red, false, 3.0f);
+    Destroy();
+}

@@ -2,7 +2,7 @@
 
 APiercingBullet::APiercingBullet()
 {
-	Speed = 500.0f;
+	Speed = 9000.0f;
 	BulletDamage = 0.0f;
 }
 
