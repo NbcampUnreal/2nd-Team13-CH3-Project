@@ -6,6 +6,8 @@
 #include "GameFramework/GameState.h"
 #include "Shadow_of_the_DesertGameState.generated.h"
 
+class AHUD;
+
 /**
  * 
  */
@@ -24,9 +26,9 @@ public:
 	int32 AllEnemyCount;
 
 	// 적 스폰 양
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Enemy")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	int32 MinSpawnNum;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Enemy")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	int32 MaxSpawnNum;
 
 	// 게임이 일시정지 상태인지 여부
@@ -41,12 +43,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> EndMenuWidgetClass;
 
-	// HUD 위젯 생성 및 관리
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<UUserWidget> HUDWidgetClass;
+	
 
-	// 보스, 플레이어 사망 여부
-	bool bIsBossDead;
+	// 제한 시간 지났는지, 플레이어 사망 여부
+	bool bIsTimesUp;
 	bool bIsPlayerDead;
 	
 
@@ -75,12 +75,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GameFlow")
 	void LocalReStartGame();
 
-
-	void SetHUDVisibility(bool bVisible);
-	void SpawnBoss();
+	void SetDamage(int32 Damage);
+	void SetTakenDamage(int32 Damage);
+	void CheckTimesUp();
 	void KillEnemy(int32 Score);	// 적을 죽었을때
 	void EnemySpawn();
 	void TimerUpdate();
+	void SetHUDVisibility(bool bVisible);
+	void SetingHUD();
 	void UpdateHUD();
 	void GameEnd(FString Result);	// 게임 종료
 
@@ -90,7 +92,13 @@ protected:
 	
 private:
 	bool bIsTimerRunning;
+	bool bIsGameEnded;
+	int32 RoundScore;
 	UUserWidget* PauseMenuWidget;
 	UUserWidget* EndMenuWidget;
+
+	// HUD 위젯
+	AHUD* HUDInstance;
+	TSubclassOf<UUserWidget> HUDWidgetClass;
 	UUserWidget* HUDWidget;
 };

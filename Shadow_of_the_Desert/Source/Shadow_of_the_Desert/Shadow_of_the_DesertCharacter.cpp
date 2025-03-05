@@ -253,16 +253,25 @@ void AShadow_of_the_DesertCharacter::Reload(const FInputActionValue& value)
 void AShadow_of_the_DesertCharacter::Swap_Rifle(const FInputActionValue& value)
 {
 	EquipWeapon(RifleClass); // RifleClass�� TSubclassOf<AWeaponBase>�� ����Ǿ� �־�� �մϴ�.
+	Ues_Rifle_now = true;
+	Ues_Sniper_now = false;
+	Ues_Rocket_now = false;
 }
 
 void AShadow_of_the_DesertCharacter::Swap_Sinper(const FInputActionValue& value)
 {
 	EquipWeapon(SniperClass); // SniperClass�� ���������� ���� �ʿ�
+	Ues_Rifle_now = false;
+	Ues_Sniper_now = true;
+	Ues_Rocket_now = false;
 }
 
 void AShadow_of_the_DesertCharacter::Swap_Rocket(const FInputActionValue& value)
 {
 	EquipWeapon(RocketLauncherClass); // RocketLauncherClass�� �ʿ�
+	Ues_Rifle_now = false;
+	Ues_Sniper_now = false;
+	Ues_Rocket_now = true;
 }
 
 float AShadow_of_the_DesertCharacter::GetHelth() {
