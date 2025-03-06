@@ -12,6 +12,7 @@
 #include "../Shadow_of_the_DesertGameState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "EnemyAIController.h"
 #include "EnemyCharacterAi.generated.h"
 
 UCLASS()
@@ -24,8 +25,6 @@ public:
 	AEnemyCharacterAi();
 	UFUNCTION(BlueprintCallable)
 	void EnemyAttack();
-	UFUNCTION(BlueprintCallable)
-	void ApplyDamage();
 	UFUNCTION(BlueprintCallable)
 	void EnemyTakeDamage(const float damage);
 	UFUNCTION(BlueprintCallable)
@@ -71,7 +70,7 @@ protected:
 	float attackSpeed;
 	bool isDead;
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<class UDamageTextWidget> DamageTextWidgetClass;
+	TSubclassOf<class UDamageTextWidget> DamageTextWidgetClass;	
 
 	UMaterialInstanceDynamic* originMaterial;
 	UMaterialInstanceDynamic* hitMaterial;
@@ -85,4 +84,6 @@ protected:
 	USphereComponent* attackCollision;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Collision")
 	UCapsuleComponent* hitBoxCollision;
+
+	
 };

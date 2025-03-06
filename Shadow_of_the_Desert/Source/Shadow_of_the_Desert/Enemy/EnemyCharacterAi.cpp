@@ -2,7 +2,6 @@
 
 
 #include "EnemyCharacterAi.h"
-#include "EnemyAIController.h"
 #include "CustomHUD.h"
 #include "../Shadow_of_the_DesertCharacter.h"
 #include "Kismet/GameplayStatics.h"
@@ -30,19 +29,16 @@ AEnemyCharacterAi::AEnemyCharacterAi()
 
 	attackCollision = CreateDefaultSubobject<USphereComponent>(TEXT("AttackCollision"));
 	attackCollision->SetupAttachment(RootComponent);
-
 	attackCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	attackCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
 	attackCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
 	attackCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-
 	attackCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacterAi::OnHit);
 
 	hitBoxCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("HitBoxCollision"));
 	hitBoxCollision->SetupAttachment(RootComponent);
-
 	hitBoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	hitBoxCollision->SetCollisionResponseToAllChannels(ECR_Overlap);	
+	hitBoxCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
 }
 
 void AEnemyCharacterAi::BeginPlay()
@@ -58,15 +54,11 @@ void AEnemyCharacterAi::BeginPlay()
 	USkeletalMeshComponent* meshComp = GetMesh();
 	if (meshComp)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("find mesh"));
 		originMaterial = meshComp->CreateAndSetMaterialInstanceDynamic(0);
 
 		hitMaterial = UMaterialInstanceDynamic::Create(originMaterial->GetMaterial(), this);
 		if (hitMaterial)
 		{
-			//meshComp->SetMaterial(0, hitMaterial);
-			//UE_LOG(LogTemp, Warning, TEXT("set hit material"));
-			//hitMaterial->SetVectorParameterValue("BaseColor", FLinearColor::Red);
 			hitMaterial->SetVectorParameterValue("BaseColor", FLinearColor::Red);
 		}
 	}
@@ -75,22 +67,13 @@ void AEnemyCharacterAi::BeginPlay()
 void AEnemyCharacterAi::EnemyAttack()
 {	
 	FTimerHandle attackTimer;
-	//FTimerHandle finishTimer;
 	GetWorld()->GetTimerManager().SetTimer(attackTimer, [this]()
 		{
 			attackCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		}, attackSpeed, false);
 	
 	PlayAttackAnimation();
-	//ApplyDamage();
-	//GetWorld()->GetTimerManager().SetTimer(finishTimer, this, &AEnemyCharacterAi::DisableAttackCollision, 0.5f, false);
 	DisableAttackCollision();
-	/*
-	AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());
-	if (gameState)
-	{
-		gameState->KillEnemy(scorePoint);
-	}*/
 }
 
 void AEnemyCharacterAi::OnHit(
@@ -108,11 +91,6 @@ void AEnemyCharacterAi::OnHit(
 		AAIController* aiCtl = Cast<AAIController>(GetController());
 		if (playerChr&&aiCtl)
 		{
-//			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "Player Hit");
-//			FString dDM = FString::Printf(TEXT("Damage apply : %.2f"), GetAtkPower());
-//			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Green, dDM);
-//			UE_LOG(LogTemp, Warning, TEXT("%s"), *dDM);
-			//playerChr->TakeDamage(attackPower);
 			playerChr->TakeDamage(GetAtkPower(), FDamageEvent(), aiCtl, this);
 		}
 	}
@@ -131,51 +109,54 @@ void AEnemyCharacterAi::DisableAttackCollision()
 }
 
 void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
-{
-	currentHp -= damage;
+{	
 	/*
 	if (!isDead)
 	{
 		SetHitMaterial();
 	}*/
-
 	AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());
 	if (gameState)
 	{
-		gameState->SetDamage(damage);
-	
-		// 적 머리 위에 데미지 숫자 표시
-		ShowDamageText(static_cast<int32>(damage));
+		if (!isDead)
+		{
+			currentHp -= damage;
 
-		// 히트마커 표시 (적이 맞았을 때)
-		APlayerController* PlayerController = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-		if (PlayerController)
-		{
-			ACustomHUD* HUD = Cast<ACustomHUD>(PlayerController->GetHUD());
-			if (HUD)
-			{
-				HUD->ShowHitmarker(); // 히트마커 활성화
-			}
-		}
-	
-		if (currentHp <= 0&&!isDead)
-		{
-			// 킬마커 표시 (적이 죽었을 때)
+			gameState->SetDamage(damage);
+
+			// 적 머리 위에 데미지 숫자 표시
+			ShowDamageText(static_cast<int32>(damage));
+
+			// 히트마커 표시 (적이 맞았을 때)
+			APlayerController* PlayerController = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 			if (PlayerController)
 			{
 				ACustomHUD* HUD = Cast<ACustomHUD>(PlayerController->GetHUD());
 				if (HUD)
 				{
-					HUD->ShowKillmarker(); // 킬마커 활성화
+					HUD->ShowHitmarker(); // 히트마커 활성화
 				}
 			}
-			PlayDeadAnimation();
-			gameState->KillEnemy(scorePoint);
-			UnpossessAI();
-			isDead = true;
-			FTimerHandle delayTime;
-			GetWorld()->GetTimerManager().SetTimer(delayTime, this, &AEnemyCharacterAi::EnemyDespawn, 5.0f, false);
-		}
+
+			if (currentHp <= 0)
+			{
+				// 킬마커 표시 (적이 죽었을 때)
+				if (PlayerController)
+				{
+					ACustomHUD* HUD = Cast<ACustomHUD>(PlayerController->GetHUD());
+					if (HUD)
+					{
+						HUD->ShowKillmarker(); // 킬마커 활성화
+					}
+				}
+				PlayDeadAnimation();
+				gameState->KillEnemy(scorePoint);
+				UnpossessAI();
+				isDead = true;
+				FTimerHandle delayTime;
+				GetWorld()->GetTimerManager().SetTimer(delayTime, this, &AEnemyCharacterAi::EnemyDespawn, 5.0f, false);
+			}
+		}		
 	}	
 }
 
@@ -188,8 +169,6 @@ void AEnemyCharacterAi::PlayAttackAnimation()
 {
 	if (attackAnim && GetMesh())
 	{
-//		FTimerHandle attackTimer;
-//		GetWorld()->GetTimerManager().SetTimer(attackTimer, this, &AEnemyCharacterAi::ActivateAttackCollision, 0.5f, false);
 		GetMesh()->PlayAnimation(attackAnim, false);
 	}
 }
@@ -201,7 +180,7 @@ void AEnemyCharacterAi::PlayDeadAnimation()
 		GetMesh()->PlayAnimation(deadAnim, false);
 	}
 }
-
+/*
 void AEnemyCharacterAi::ApplyDamage()
 {
 	TArray<AActor*> overlapActors;
@@ -218,7 +197,7 @@ void AEnemyCharacterAi::ApplyDamage()
 			}
 		}
 	}
-}
+}*/
 
 float AEnemyCharacterAi::GetAtkPower()
 {
@@ -228,7 +207,6 @@ float AEnemyCharacterAi::GetAtkPower()
 void AEnemyCharacterAi::UnpossessAI()
 {
 	AAIController* aiCtl = Cast<AAIController>(GetController());
-
 	if (aiCtl)
 	{
 		aiCtl->UnPossess();
@@ -273,7 +251,6 @@ void AEnemyCharacterAi::SetHitMaterial()
 {
 	if (GetMesh() && hitMaterial)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("red material"));
 		FTimerHandle resetTimer;
 		GetMesh()->SetMaterial(0, hitMaterial);
 
@@ -285,7 +262,6 @@ void AEnemyCharacterAi::ResetMaterial()
 {
 	if (GetMesh() && originMaterial)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("reset material"));
 		GetMesh()->SetMaterial(0, originMaterial);
 	}
 }
