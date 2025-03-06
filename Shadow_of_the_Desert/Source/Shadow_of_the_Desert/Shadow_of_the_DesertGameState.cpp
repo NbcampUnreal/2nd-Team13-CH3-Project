@@ -337,7 +337,11 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 				int32 PlayerDamage = SOTDInstance->TotalDamageDealt;
 				FString DamageText;
 
-				if (PlayerDamage >= 1000) // 1000 이상이면 "1.0K" 형식으로 표시
+				if (PlayerDamage >= 1000000) // 1M 이상이면 "1.2M" 형식으로 표시
+				{
+					DamageText = FString::Printf(TEXT("%.1fM"), PlayerDamage / 1000000.0f);
+				}
+				else if (PlayerDamage >= 1000) // 1000 이상이면 "1.0K" 형식으로 표시
 				{
 					DamageText = FString::Printf(TEXT("%.1fK"), PlayerDamage / 1000.0f);
 				}
