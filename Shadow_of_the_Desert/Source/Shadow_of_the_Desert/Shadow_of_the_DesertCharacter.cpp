@@ -288,11 +288,12 @@ float AShadow_of_the_DesertCharacter::TakeDamage(float DamageAmount,
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	Health = FMath::Clamp(Health - DamageAmount, 0.0f, MaxHealth);
-	if (Health == 0.0) 
+	if (AShadow_of_the_DesertGameState* SOTDGameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState()))
 	{
-		AShadow_of_the_DesertGameState* GameOver = GetWorld() ? GetWorld()->GetGameState<AShadow_of_the_DesertGameState>() : nullptr;
-		if (GameOver) {
-			GameOver->GameEnd("Defeat");
+		SOTDGameState->SetTakenDamage(DamageAmount);
+		if (Health == 0.0)
+		{
+			SOTDGameState->GameEnd("Defeat");
 		}
 	}
 
@@ -358,4 +359,8 @@ void AShadow_of_the_DesertCharacter::EquipWeapon(TSubclassOf<AWeaponBase> Weapon
 			}
 		}
 	}
+}
+
+AWeaponBase* AShadow_of_the_DesertCharacter::GetEquippedWeapon() {
+	return EquippedWeapon;
 }

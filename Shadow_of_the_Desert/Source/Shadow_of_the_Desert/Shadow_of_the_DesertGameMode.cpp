@@ -52,13 +52,11 @@ void AShadow_of_the_DesertGameMode::ShowMainMenu()
 {
 	if (MainMenuWidgetClass != nullptr)
 	{
-		// 위젯 생성 및 저장
 		MainMenuWidget = CreateWidget<UUserWidget>(GetWorld(), MainMenuWidgetClass);
 		if (MainMenuWidget != nullptr)
 		{
 			MainMenuWidget->AddToViewport();
 
-			// UI 전용 입력 모드로 전환
 			if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
 			{
 				FInputModeUIOnly InputMode;
