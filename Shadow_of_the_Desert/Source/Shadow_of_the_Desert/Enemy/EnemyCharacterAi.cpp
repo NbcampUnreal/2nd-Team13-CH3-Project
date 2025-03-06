@@ -53,14 +53,6 @@ void AEnemyCharacterAi::BeginPlay()
 	{
 		// 블루프린트 클래스를 런타임에 로드
 		DamageTextWidgetClass = LoadClass<UDamageTextWidget>(nullptr, TEXT("/Game/UI/Widgets/WBP_DamageText.WBP_DamageText_C"));
-		if (!DamageTextWidgetClass)
-		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to load WBP_DamageText!"));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Successfully loaded WBP_DamageText!"));
-		}
 	}
 
 	USkeletalMeshComponent* meshComp = GetMesh();
@@ -246,33 +238,35 @@ void AEnemyCharacterAi::UnpossessAI()
 void AEnemyCharacterAi::ShowDamageText(int32 Damage)
 {
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (!PC)
-	{
-		UE_LOG(LogTemp, Error, TEXT("PlayerController is NULL!"));
-		return;
-	}
+	if (!PC) return;
 
 	// WBP_DamageText 블루프린트 UI 위젯 생성
 	UUserWidget* DamageWidget = CreateWidget<UUserWidget>(PC, LoadClass<UUserWidget>(nullptr, TEXT("/Game/UI/Widgets/WBP_DamageText.WBP_DamageText_C")));
-	if (!DamageWidget)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to create WBP_DamageText!"));
-		return;
-	}
+	if (!DamageWidget) return;
 
-	// 위젯 내부에서 "DamageText"라는 이름의 TextBlock 찾기
+	// 텍스트 설정
 	UTextBlock* DamageText = Cast<UTextBlock>(DamageWidget->GetWidgetFromName(TEXT("DamageText")));
 	if (DamageText)
 	{
 		DamageText->SetText(FText::FromString(FString::Printf(TEXT("%d"), Damage)));
 	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Failed to find DamageText in WBP_DamageText!"));
-	}
 
-	// 위젯을 화면에 추가
+	// 적 위치를 가져와서 머리 위로 조정
+	FVector WorldLocation = GetActorLocation() + FVector(0, 0, 100);
+
+	// 월드 좌표 → 스크린 좌표 변환
+	FVector2D ScreenPosition;
+	if (!PC->ProjectWorldLocationToScreen(WorldLocation, ScreenPosition)) return;
+
+	// 위젯을 뷰포트에 추가
 	DamageWidget->AddToViewport();
+
+	// 해상도 독립적인 위치 적용 (SetRenderTranslation)
+	UWidget* RootWidget = DamageWidget->GetRootWidget();
+	if (RootWidget)
+	{
+		RootWidget->SetRenderTranslation(ScreenPosition);
+	}
 }
 
 void AEnemyCharacterAi::SetHitMaterial()
