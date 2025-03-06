@@ -6,7 +6,7 @@ ARocketLauncher::ARocketLauncher()
 	RocketLauncherBulletMesh->SetupAttachment(WeaponMesh);
 
 	//Ω∫≈»
-	AttackDamage = 100.0f;
+	AttackDamage = 500.0f;
 	CurrentAmmo = 1;
 	MaxAmmo = 1;
 	bIsReloading = false;
