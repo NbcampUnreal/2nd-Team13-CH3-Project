@@ -18,8 +18,8 @@ AWeaponBase::AWeaponBase()
 	AttackRate = 0.0f;
 	ReloadTime = 0.0f;
 	SpreadAngle = 0.0f;
-
 	DamageIncreaseRate = 0;
+	bCanAttack = false;
 }
 
 void AWeaponBase::Reload()
@@ -64,7 +64,7 @@ void AWeaponBase::CancelReload()
 
 void AWeaponBase::Attack()
 {
-	if (bIsReloading)
+	if (bIsReloading && !bCanAttack)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("rerererere"))
 		return;
