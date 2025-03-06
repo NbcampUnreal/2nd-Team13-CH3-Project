@@ -370,13 +370,14 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 			// 현재 무기의 정보 가져오기
 			AWeaponBase* CurrentWeapon = PlayerCharacter->GetEquippedWeapon();
 
+			int32 CurrentAmmo = CurrentWeapon->CurrentAmmo;
+			int32 MaxAmmo = CurrentWeapon->MaxAmmo;
+
 			// 현재 장착된 무기에 따라 맞는 HUD 출력
 			if (PlayerCharacter->Ues_Rifle_now && RifleImage&&CurrentWeapon)
 			{
 				RifleImage->SetVisibility(ESlateVisibility::Visible);
 
-				int32 CurrentAmmo = 0;
-				int32 MaxAmmo = 0;
 				CurrentAmmoTextBox->SetText(FText::FromString(FString::Printf(TEXT("%d"), CurrentAmmo)));
 				MaxAmmoTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), MaxAmmo)));
 			}
@@ -384,8 +385,6 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 			{
 				SniperImage->SetVisibility(ESlateVisibility::Visible);
 
-				int32 CurrentAmmo = 0;
-				int32 MaxAmmo = 0;
 				CurrentAmmoTextBox->SetText(FText::FromString(FString::Printf(TEXT("%d"), CurrentAmmo)));
 				MaxAmmoTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), MaxAmmo)));
 			}
@@ -393,8 +392,6 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 			{
 				RocketImage->SetVisibility(ESlateVisibility::Visible);
 
-				int32 CurrentAmmo = 0;
-				int32 MaxAmmo = 0;
 				CurrentAmmoTextBox->SetText(FText::FromString(FString::Printf(TEXT("%d"), CurrentAmmo)));
 				MaxAmmoTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), MaxAmmo)));
 			}
