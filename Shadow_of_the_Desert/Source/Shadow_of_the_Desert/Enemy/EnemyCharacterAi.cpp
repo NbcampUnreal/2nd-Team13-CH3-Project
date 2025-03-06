@@ -36,7 +36,27 @@ AEnemyCharacterAi::AEnemyCharacterAi()
 	hitBoxCollision->SetupAttachment(RootComponent);
 
 	hitBoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	hitBoxCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
+	hitBoxCollision->SetCollisionResponseToAllChannels(ECR_Overlap);	
+}
+
+void AEnemyCharacterAi::BeginPlay()
+{
+	Super::BeginPlay();
+	USkeletalMeshComponent* meshComp = GetMesh();
+	if (meshComp)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("find mesh"));
+		originMaterial = meshComp->CreateAndSetMaterialInstanceDynamic(0);
+
+		hitMaterial = UMaterialInstanceDynamic::Create(originMaterial->GetMaterial(), this);
+		if (hitMaterial)
+		{
+			//meshComp->SetMaterial(0, hitMaterial);
+			//UE_LOG(LogTemp, Warning, TEXT("set hit material"));
+			//hitMaterial->SetVectorParameterValue("BaseColor", FLinearColor::Red);
+			hitMaterial->SetVectorParameterValue("BaseColor", FLinearColor::Red);
+		}
+	}
 }
 
 void AEnemyCharacterAi::EnemyAttack()
@@ -100,6 +120,13 @@ void AEnemyCharacterAi::DisableAttackCollision()
 void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 {
 	currentHp -= damage;
+	
+	//UE_LOG(LogTemp, Warning, TEXT("try red material"));
+/*	if (!isDead)
+	{
+		SetHitMaterial();
+	}*/
+
 	if (currentHp <= 0&&!isDead)
 	{
 		PlayDeadAnimation();
@@ -169,5 +196,26 @@ void AEnemyCharacterAi::UnpossessAI()
 	if (aiCtl)
 	{
 		aiCtl->UnPossess();
+	}
+}
+
+void AEnemyCharacterAi::SetHitMaterial()
+{
+	if (GetMesh() && hitMaterial)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("red material"));
+		FTimerHandle resetTimer;
+		GetMesh()->SetMaterial(0, hitMaterial);
+
+		GetWorld()->GetTimerManager().SetTimer(resetTimer, this, &AEnemyCharacterAi::ResetMaterial, 0.3f, false);
+	}
+}
+
+void AEnemyCharacterAi::ResetMaterial()
+{
+	if (GetMesh() && originMaterial)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("reset material"));
+		GetMesh()->SetMaterial(0, originMaterial);
 	}
 }
