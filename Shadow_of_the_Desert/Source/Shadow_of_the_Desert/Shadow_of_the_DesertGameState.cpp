@@ -15,10 +15,12 @@
 #include "GameFramework/GameModeBase.h"
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
+#include "Components/Image.h"
 
 AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 {
 	RoundScore = 0;
+	WaveCount = 0;
 	KillEnemyCount = 0;
 	AllEnemyCount = 0;
 	MinSpawnNum = 2;
@@ -204,6 +206,7 @@ void AShadow_of_the_DesertGameState::KillEnemy(int32 Score)
 
 void AShadow_of_the_DesertGameState::EnemySpawn()
 {
+	WaveCount++;
 	// ��Ƽ�� �ð� ����
 	if (LocalElapsedTime >= 180.0f)
 	{
@@ -293,7 +296,15 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 {
 	if (HUDWidget)
 	{
-		// ���� �ð� ǥ��
+		// 웨이브 표시
+		UTextBlock* CurrentWaveBlock = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("CurrentWaveBlock")));
+		if (CurrentWaveBlock)
+		{
+			int32 WaveNum = WaveCount;
+			CurrentWaveBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), WaveNum)));
+		}
+
+		// 인게임 시간 표기
 		UTextBlock* TimeText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("WaveTimerTextBlock")));
 		if (TimeText)
 		{
@@ -316,7 +327,7 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 		{
 			EnemyKillCountText->SetText(FText::FromString(FString::Printf(TEXT("%d"), KillEnemyCount)));
 		}
-
+		
 		// 플레이어 데미지
 		if (UShadow_of_the_DesertGameInstance* SOTDInstance = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
 		{
@@ -324,7 +335,68 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 			if (PlayerDamageText)
 			{
 				int32 PlayerDamage = SOTDInstance->TotalDamageDealt;
-				PlayerDamageText->SetText(FText::FromString(FString::Printf(TEXT("%d"), PlayerDamage)));
+				FString DamageText;
+
+				if (PlayerDamage >= 1000) // 1000 이상이면 "1.0K" 형식으로 표시
+				{
+					DamageText = FString::Printf(TEXT("%.1fK"), PlayerDamage / 1000.0f);
+				}
+				else // 1000 미만이면 그대로 숫자로 표시
+				{
+					DamageText = FString::Printf(TEXT("%d"), PlayerDamage);
+				}
+
+				PlayerDamageText->SetText(FText::FromString(DamageText));
+			}
+		}
+
+		// 플레이어 무기 상태 업데이트
+		if (AShadow_of_the_DesertCharacter* PlayerCharacter = Cast<AShadow_of_the_DesertCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0)))
+		{
+			// 각 무기에 대한 UImage 가져오기
+			UImage* RifleImage = Cast<UImage>(HUDWidget->GetWidgetFromName(TEXT("AKImage")));
+			UImage* SniperImage = Cast<UImage>(HUDWidget->GetWidgetFromName(TEXT("SniperRifleImage")));
+			UImage* RocketImage = Cast<UImage>(HUDWidget->GetWidgetFromName(TEXT("RPGImage")));
+
+			// 총알 표기 상자
+			UTextBlock* CurrentAmmoTextBox = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("CurrentAmmoTextBox")));
+			UTextBlock* MaxAmmoTextBlock = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("MaxAmmoTextBlock")));
+			
+			// 모든 무기 UI를 숨김
+			if (RifleImage) RifleImage->SetVisibility(ESlateVisibility::Hidden);
+			if (SniperImage) SniperImage->SetVisibility(ESlateVisibility::Hidden);
+			if (RocketImage) RocketImage->SetVisibility(ESlateVisibility::Hidden);
+			
+			// 현재 무기의 정보 가져오기
+			AWeaponBase* CurrentWeapon = PlayerCharacter->GetEquippedWeapon();
+
+			// 현재 장착된 무기에 따라 맞는 HUD 출력
+			if (PlayerCharacter->Ues_Rifle_now && RifleImage&&CurrentWeapon)
+			{
+				RifleImage->SetVisibility(ESlateVisibility::Visible);
+
+				int32 CurrentAmmo = 0;
+				int32 MaxAmmo = 0;
+				CurrentAmmoTextBox->SetText(FText::FromString(FString::Printf(TEXT("%d"), CurrentAmmo)));
+				MaxAmmoTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), MaxAmmo)));
+			}
+			else if (PlayerCharacter->Ues_Sniper_now&&SniperImage&&CurrentWeapon)
+			{
+				SniperImage->SetVisibility(ESlateVisibility::Visible);
+
+				int32 CurrentAmmo = 0;
+				int32 MaxAmmo = 0;
+				CurrentAmmoTextBox->SetText(FText::FromString(FString::Printf(TEXT("%d"), CurrentAmmo)));
+				MaxAmmoTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), MaxAmmo)));
+			}
+			else if (PlayerCharacter->Ues_Rocket_now&&RocketImage&&CurrentWeapon)
+			{
+				RocketImage->SetVisibility(ESlateVisibility::Visible);
+
+				int32 CurrentAmmo = 0;
+				int32 MaxAmmo = 0;
+				CurrentAmmoTextBox->SetText(FText::FromString(FString::Printf(TEXT("%d"), CurrentAmmo)));
+				MaxAmmoTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), MaxAmmo)));
 			}
 		}
 
@@ -362,7 +434,6 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 				}
 
 				//경험치바
-
 				/*UProgressBar* ExpBar = Cast<UProgressBar>(HUDWidget->GetWidgetFromName(TEXT("LevelProgressBar")));
 				if (ExpBar)
 				{
@@ -376,16 +447,6 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 }
 
 void AShadow_of_the_DesertGameState::LocalResetGame()
-{
-	// 현재 실행 중인 맵 이름 가져오기
-	FString CurrentLevelName = GetWorld()->GetMapName();
-	CurrentLevelName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix); // 필요할 경우 접두사 제거
-
-	// 현재 맵 다시 로드
-	UGameplayStatics::OpenLevel(this, FName(*CurrentLevelName));
-}
-
-void AShadow_of_the_DesertGameState::LocalReStartGame()
 {
 	if (EndMenuWidget)
 	{
@@ -406,7 +467,7 @@ void AShadow_of_the_DesertGameState::LocalReStartGame()
 		}
 	}
 
-	// ���� �����ϴ� ���⵵ ����
+	// 총기 제거
 	TArray<AActor*> FoundWeapons;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AWeaponBase::StaticClass(), FoundWeapons);
 
@@ -419,8 +480,9 @@ void AShadow_of_the_DesertGameState::LocalReStartGame()
 		}
 	}
 
-	// ���� ���� ���� �ʱ�ȭ
+	// 내용 초기화
 	RoundScore = 0;
+	WaveCount = 0;
 	KillEnemyCount = 0;
 	AllEnemyCount = 0;
 	MinSpawnNum = 2;
@@ -443,17 +505,44 @@ void AShadow_of_the_DesertGameState::LocalReStartGame()
 	// 타이머 리셋
 	GetWorldTimerManager().ClearTimer(GameTimerHandle);
 	GetWorldTimerManager().ClearTimer(EnemyTimerHandle);
+}
+
+void AShadow_of_the_DesertGameState::LocalReStartGame()
+{
+	//초기화
+	LocalResetGame();
 
 	// 게임 시작
 	LocalStartGame();
 }
 
+void AShadow_of_the_DesertGameState::GoMainMenu()
+{
+	if (APlayerController* PlayerController = GetWorld()->GetFirstPlayerController())
+	{
+		PlayerController->SetPause(false);
+	}
+
+	// 타이머 정리
+	GetWorldTimerManager().ClearTimer(GameTimerHandle);
+	GetWorldTimerManager().ClearTimer(HUDUpdateTimerHandle);
+	GetWorldTimerManager().ClearTimer(EnemyTimerHandle);
+
+	// 초기화
+	LocalResetGame();
+
+	if (AShadow_of_the_DesertGameMode* GameMode = Cast<AShadow_of_the_DesertGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		GameMode->ShowMainMenu();
+	}
+}
+
 void AShadow_of_the_DesertGameState::GameEnd(FString Result)
 {
-	// ���� ���� ���� ����
+	// 게임 종료 체크
 	bIsGameEnded = true;
 
-	// ���� �� ��� ������ ������ ����
+	// 메뉴를 제외한 모든것 정지
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
 
 	GetWorldTimerManager().ClearTimer(GameTimerHandle);
