@@ -246,8 +246,7 @@ void AExplosiveBullet::Explode(FVector Location)
             }
         }
     }
-
     // 4. 디버그 및 이펙트 처리
-    DrawDebugSphere(GetWorld(), Location, ExplosionRadius, 12, FColor::Red, false, 3.0f);
+    //DrawDebugSphere(GetWorld(), Location, ExplosionRadius, 12, FColor::Red, false, 3.0f);
     Destroy();
 }
