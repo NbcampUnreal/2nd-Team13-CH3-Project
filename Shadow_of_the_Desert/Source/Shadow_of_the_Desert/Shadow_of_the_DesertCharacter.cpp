@@ -309,24 +309,40 @@ void AShadow_of_the_DesertCharacter::EquipWeapon(TSubclassOf<AWeaponBase> Weapon
 			return;
 		}
 
-		int32 PreviousAmmo = 0;
 		if (EquippedWeapon)
 		{
 			if (EquippedWeapon->bIsReloading)
 			{
 				EquippedWeapon->CancelReload();
 			}
-			PreviousAmmo = EquippedWeapon->CurrentAmmo;
-			EquippedWeapon->Destroy(); 
+
+			if (EquippedWeapon->IsA(ARifle::StaticClass())) {
+				RifleAmmo = EquippedWeapon->CurrentAmmo;
+			}
+			else if (EquippedWeapon->IsA(ASniper::StaticClass())) {
+				SniperAmmo = EquippedWeapon->CurrentAmmo;
+			}
+			else if (EquippedWeapon->IsA(ARocketLauncher::StaticClass())) {
+				RocketLauncherAmmo = EquippedWeapon->CurrentAmmo;
+			}
+			EquippedWeapon->Destroy();
 			EquippedWeapon = nullptr;
 		}
 
 		EquippedWeapon = GetWorld()->SpawnActor<AWeaponBase>(WeaponClass);
-		UE_LOG(LogTemp, Warning, TEXT("Weapon class: %s"), *WeaponClass->GetName());
+
+		if (WeaponClass->IsChildOf(ARifle::StaticClass())) {
+			EquippedWeapon->CurrentAmmo = FMath::Clamp(RifleAmmo, 0, EquippedWeapon->MaxAmmo);
+		}
+		else if (WeaponClass->IsChildOf(ASniper::StaticClass())) {
+			EquippedWeapon->CurrentAmmo = FMath::Clamp(SniperAmmo, 0, EquippedWeapon->MaxAmmo);
+		}
+		else if (WeaponClass->IsChildOf(ARocketLauncher::StaticClass())) {
+			EquippedWeapon->CurrentAmmo = FMath::Clamp(RocketLauncherAmmo, 0, EquippedWeapon->MaxAmmo);
+		}
 
 		if (EquippedWeapon)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Weapon equipped: %s"), *EquippedWeapon->GetName());
 			EquippedWeapon->bCanAttack = false;
 
 			GetWorld()->GetTimerManager().SetTimer(
@@ -339,15 +355,7 @@ void AShadow_of_the_DesertCharacter::EquipWeapon(TSubclassOf<AWeaponBase> Weapon
 				false
 			);
 
-			if (!bIsfirst)
-			{
-				EquippedWeapon->CurrentAmmo = PreviousAmmo;
-			}
-			else
-			{
-				EquippedWeapon->CurrentAmmo = EquippedWeapon->MaxAmmo;
-				bIsfirst = false;
-			}
+
 
 			USkeletalMeshComponent* SkeletalMesh = GetMesh();
 			if (SkeletalMesh)

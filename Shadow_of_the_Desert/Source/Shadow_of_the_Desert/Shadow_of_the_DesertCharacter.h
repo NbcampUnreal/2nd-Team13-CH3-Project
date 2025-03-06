@@ -115,7 +115,9 @@ private:
 	float Speed;
 	float SprintSpeedMultiplier;
 	float SprintSpeed;
-
+	int32 RifleAmmo = 90;
+	int32 SniperAmmo = 5;
+	int32 RocketLauncherAmmo = 1;
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
