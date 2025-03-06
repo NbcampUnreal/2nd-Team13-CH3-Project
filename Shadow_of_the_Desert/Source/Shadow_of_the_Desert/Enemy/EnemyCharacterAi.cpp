@@ -48,6 +48,21 @@ AEnemyCharacterAi::AEnemyCharacterAi()
 void AEnemyCharacterAi::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (!DamageTextWidgetClass)
+	{
+		// 블루프린트 클래스를 런타임에 로드
+		DamageTextWidgetClass = LoadClass<UDamageTextWidget>(nullptr, TEXT("/Game/UI/Widgets/WBP_DamageText.WBP_DamageText_C"));
+		if (!DamageTextWidgetClass)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to load WBP_DamageText!"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Successfully loaded WBP_DamageText!"));
+		}
+	}
+
 	USkeletalMeshComponent* meshComp = GetMesh();
 	if (meshComp)
 	{
@@ -61,25 +76,6 @@ void AEnemyCharacterAi::BeginPlay()
 			//UE_LOG(LogTemp, Warning, TEXT("set hit material"));
 			//hitMaterial->SetVectorParameterValue("BaseColor", FLinearColor::Red);
 			hitMaterial->SetVectorParameterValue("BaseColor", FLinearColor::Red);
-		}
-	}
-}
-
-void AEnemyCharacterAi::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if (!DamageTextWidgetClass)
-	{
-		// 블루프린트 클래스를 런타임에 로드
-		DamageTextWidgetClass = LoadClass<UDamageTextWidget>(nullptr, TEXT("/Game/UI/Widgets/WBP_DamageText.WBP_DamageText_C"));
-		if (!DamageTextWidgetClass)
-		{
-			UE_LOG(LogTemp, Error, TEXT("Failed to load WBP_DamageText!"));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Successfully loaded WBP_DamageText!"));
 		}
 	}
 }
@@ -146,11 +142,10 @@ void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 {
 	currentHp -= damage;
 
-	//UE_LOG(LogTemp, Warning, TEXT("try red material"));
-/*	if (!isDead)
+	if (!isDead)
 	{
 		SetHitMaterial();
-	}*/
+	}
 
 	AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());
 	if (gameState)
@@ -182,7 +177,7 @@ void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 					HUD->ShowKillmarker(); // 킬마커 활성화
 				}
 			}
-				PlayDeadAnimation();
+			PlayDeadAnimation();
 			gameState->KillEnemy(scorePoint);
 			UnpossessAI();
 			isDead = true;
@@ -235,7 +230,6 @@ void AEnemyCharacterAi::ApplyDamage()
 
 float AEnemyCharacterAi::GetAtkPower()
 {
-//	UE_LOG(LogTemp, Warning, TEXT("%.2f"), attackPower);
 	return attackPower;
 }
 
