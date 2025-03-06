@@ -37,14 +37,12 @@ AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 
 void AShadow_of_the_DesertGameState::LocalStartGame()
 {
-	// ���� ���� ���� Ȯ�� �� �ð� ����
 	if (bIsGameEnded)
 	{
 		bIsGameEnded = false;
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
 	}
 
-	// ���� ���۽� �ʱ�ȭ
 	if (UShadow_of_the_DesertGameInstance* SOTDInstance = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
 	{
 		SOTDInstance->TotalScore = 0;
@@ -181,7 +179,6 @@ void AShadow_of_the_DesertGameState::SetTakenDamage(int32 Damage)
 
 void AShadow_of_the_DesertGameState::CheckTimesUp()
 {
-	//���ѽð� ����(���߿� ������ ����� �װ� üũ�ϴ¿뵵�ε� ����)
 	bIsTimesUp = true;
 }
 
@@ -190,7 +187,6 @@ void AShadow_of_the_DesertGameState::KillEnemy(int32 Score)
 	RoundScore += Score;
 	KillEnemyCount++;
 
-	//���� ���� ���� ���ѽð� ���� �� ��� ���� óġ ��
 	if (bIsTimesUp && KillEnemyCount >= AllEnemyCount)
 	{
 		GameEnd("Clear");
@@ -208,12 +204,11 @@ void AShadow_of_the_DesertGameState::EnemySpawn()
 {
 	WaveCount++;
 	// ��Ƽ�� �ð� ����
-	if (LocalElapsedTime >= 180.0f)
+	if (LocalElapsedTime >= 300.0f)
 	{
-		// �ð� ���� üũ �� ���� ���� ���߱�
 		CheckTimesUp();
 		GetWorldTimerManager().ClearTimer(EnemyTimerHandle);
-
+		GameEnd("Clear");
 		return;
 	}
 
