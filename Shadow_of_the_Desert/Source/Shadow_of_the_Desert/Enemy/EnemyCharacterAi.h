@@ -11,6 +11,7 @@
 #include "Components/PrimitiveComponent.h"
 #include "../Shadow_of_the_DesertGameState.h"
 #include "Kismet/GameplayStatics.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "EnemyCharacterAi.generated.h"
 
 UCLASS()
@@ -52,7 +53,12 @@ public:
 
 	float GetAtkPower();
 	void UnpossessAI();
+
+	void SetHitMaterial();
+	void ResetMaterial();
 protected:
+	virtual void BeginPlay() override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy|Status")
 	float maxHp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Status")
@@ -66,6 +72,9 @@ protected:
 	bool isDead;
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class UDamageTextWidget> DamageTextWidgetClass;
+
+	UMaterialInstanceDynamic* originMaterial;
+	UMaterialInstanceDynamic* hitMaterial;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Animation")
 	UAnimSequence* attackAnim;

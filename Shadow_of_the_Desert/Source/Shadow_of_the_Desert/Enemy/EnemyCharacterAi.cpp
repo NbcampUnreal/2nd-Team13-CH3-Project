@@ -42,7 +42,27 @@ AEnemyCharacterAi::AEnemyCharacterAi()
 	hitBoxCollision->SetupAttachment(RootComponent);
 
 	hitBoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	hitBoxCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
+	hitBoxCollision->SetCollisionResponseToAllChannels(ECR_Overlap);	
+}
+
+void AEnemyCharacterAi::BeginPlay()
+{
+	Super::BeginPlay();
+	USkeletalMeshComponent* meshComp = GetMesh();
+	if (meshComp)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("find mesh"));
+		originMaterial = meshComp->CreateAndSetMaterialInstanceDynamic(0);
+
+		hitMaterial = UMaterialInstanceDynamic::Create(originMaterial->GetMaterial(), this);
+		if (hitMaterial)
+		{
+			//meshComp->SetMaterial(0, hitMaterial);
+			//UE_LOG(LogTemp, Warning, TEXT("set hit material"));
+			//hitMaterial->SetVectorParameterValue("BaseColor", FLinearColor::Red);
+			hitMaterial->SetVectorParameterValue("BaseColor", FLinearColor::Red);
+		}
+	}
 }
 
 void AEnemyCharacterAi::BeginPlay()
@@ -125,11 +145,18 @@ void AEnemyCharacterAi::DisableAttackCollision()
 void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 {
 	currentHp -= damage;
+
+	//UE_LOG(LogTemp, Warning, TEXT("try red material"));
+/*	if (!isDead)
+	{
+		SetHitMaterial();
+	}*/
+
 	AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());
 	if (gameState)
 	{
 		gameState->SetDamage(damage);
-
+	
 		// 적 머리 위에 데미지 숫자 표시
 		ShowDamageText(static_cast<int32>(damage));
 
@@ -143,7 +170,7 @@ void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 				HUD->ShowHitmarker(); // 히트마커 활성화
 			}
 		}
-
+	
 		if (currentHp <= 0&&!isDead)
 		{
 			// 킬마커 표시 (적이 죽었을 때)
@@ -155,15 +182,14 @@ void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 					HUD->ShowKillmarker(); // 킬마커 활성화
 				}
 			}
-
-			PlayDeadAnimation();
+				PlayDeadAnimation();
 			gameState->KillEnemy(scorePoint);
 			UnpossessAI();
 			isDead = true;
 			FTimerHandle delayTime;
 			GetWorld()->GetTimerManager().SetTimer(delayTime, this, &AEnemyCharacterAi::EnemyDespawn, 5.0f, false);
 		}
-	}
+	}	
 }
 
 void AEnemyCharacterAi::EnemyDespawn()
@@ -255,3 +281,23 @@ void AEnemyCharacterAi::ShowDamageText(int32 Damage)
 	DamageWidget->AddToViewport();
 }
 
+void AEnemyCharacterAi::SetHitMaterial()
+{
+	if (GetMesh() && hitMaterial)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("red material"));
+		FTimerHandle resetTimer;
+		GetMesh()->SetMaterial(0, hitMaterial);
+
+		GetWorld()->GetTimerManager().SetTimer(resetTimer, this, &AEnemyCharacterAi::ResetMaterial, 0.3f, false);
+	}
+}
+
+void AEnemyCharacterAi::ResetMaterial()
+{
+	if (GetMesh() && originMaterial)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("reset material"));
+		GetMesh()->SetMaterial(0, originMaterial);
+	}
+}
