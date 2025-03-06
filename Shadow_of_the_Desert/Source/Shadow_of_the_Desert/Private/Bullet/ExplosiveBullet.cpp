@@ -7,7 +7,7 @@
 AExplosiveBullet::AExplosiveBullet()
 {
     Speed = 1000.0f;
-    ExplosionRadius = 500.0f; // 폭발 범위
+    ExplosionRadius = 800.0f; // 폭발 범위
     BulletDamage = 0;   // 폭발 데미지
 }
 
@@ -246,8 +246,7 @@ void AExplosiveBullet::Explode(FVector Location)
             }
         }
     }
-
     // 4. 디버그 및 이펙트 처리
-    DrawDebugSphere(GetWorld(), Location, ExplosionRadius, 12, FColor::Red, false, 3.0f);
+    //DrawDebugSphere(GetWorld(), Location, ExplosionRadius, 12, FColor::Red, false, 3.0f);
     Destroy();
 }

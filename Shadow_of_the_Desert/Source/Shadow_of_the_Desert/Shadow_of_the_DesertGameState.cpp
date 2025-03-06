@@ -23,8 +23,8 @@ AShadow_of_the_DesertGameState::AShadow_of_the_DesertGameState()
 	WaveCount = 0;
 	KillEnemyCount = 0;
 	AllEnemyCount = 0;
-	MinSpawnNum = 2;
-	MaxSpawnNum = 3;
+	MinSpawnNum = 5;
+	MaxSpawnNum = 10;
 	PreviousMinutes = 0;
 	LocalElapsedTime = 0.0f;
 	bIsGameEnded = false;
@@ -94,7 +94,7 @@ void AShadow_of_the_DesertGameState::LocalStartGame()
 		EnemyTimerHandle,
 		this,
 		&AShadow_of_the_DesertGameState::EnemySpawn,
-		10.0f,
+		2.0f,
 		true);
 }
 
@@ -246,8 +246,8 @@ void AShadow_of_the_DesertGameState::TimerUpdate()
 
 		if (CurrentMinutes > PreviousMinutes)
 		{
-			MinSpawnNum += 2;
-			MaxSpawnNum += 2;
+			MinSpawnNum += 5;
+			MaxSpawnNum += 5;
 
 			PreviousMinutes = CurrentMinutes;
 		}
@@ -370,13 +370,14 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 			// 현재 무기의 정보 가져오기
 			AWeaponBase* CurrentWeapon = PlayerCharacter->GetEquippedWeapon();
 
+			int32 CurrentAmmo = CurrentWeapon->CurrentAmmo;
+			int32 MaxAmmo = CurrentWeapon->MaxAmmo;
+
 			// 현재 장착된 무기에 따라 맞는 HUD 출력
 			if (PlayerCharacter->Ues_Rifle_now && RifleImage&&CurrentWeapon)
 			{
 				RifleImage->SetVisibility(ESlateVisibility::Visible);
 
-				int32 CurrentAmmo = 0;
-				int32 MaxAmmo = 0;
 				CurrentAmmoTextBox->SetText(FText::FromString(FString::Printf(TEXT("%d"), CurrentAmmo)));
 				MaxAmmoTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), MaxAmmo)));
 			}
@@ -384,8 +385,6 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 			{
 				SniperImage->SetVisibility(ESlateVisibility::Visible);
 
-				int32 CurrentAmmo = 0;
-				int32 MaxAmmo = 0;
 				CurrentAmmoTextBox->SetText(FText::FromString(FString::Printf(TEXT("%d"), CurrentAmmo)));
 				MaxAmmoTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), MaxAmmo)));
 			}
@@ -393,8 +392,6 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 			{
 				RocketImage->SetVisibility(ESlateVisibility::Visible);
 
-				int32 CurrentAmmo = 0;
-				int32 MaxAmmo = 0;
 				CurrentAmmoTextBox->SetText(FText::FromString(FString::Printf(TEXT("%d"), CurrentAmmo)));
 				MaxAmmoTextBlock->SetText(FText::FromString(FString::Printf(TEXT("%d"), MaxAmmo)));
 			}
@@ -432,15 +429,6 @@ void AShadow_of_the_DesertGameState::UpdateHUD()
 					float HPPercent = CurrentHealth / MaxHP;
 					HealthBar->SetPercent(HPPercent);
 				}
-
-				//경험치바
-				/*UProgressBar* ExpBar = Cast<UProgressBar>(HUDWidget->GetWidgetFromName(TEXT("LevelProgressBar")));
-				if (ExpBar)
-				{
-					경험치로 바꿔줘야됨
-					float ExpPercent = static_cast<float>(PlayerHP) / MaxHP;
-					ExpBar->SetPercent(HPPercent);
-				}*/
 			}
 		}
 	}
@@ -452,6 +440,12 @@ void AShadow_of_the_DesertGameState::LocalResetGame()
 	{
 		EndMenuWidget->RemoveFromParent();
 		EndMenuWidget = nullptr; // 포인터 초기화
+	}
+
+	if (PauseMenuWidget)
+	{
+		PauseMenuWidget->RemoveFromParent();
+		PauseMenuWidget = nullptr; // 포인터 초기화
 	}
 
 	// 현재 존재하는 적들만 제거
@@ -485,8 +479,8 @@ void AShadow_of_the_DesertGameState::LocalResetGame()
 	WaveCount = 0;
 	KillEnemyCount = 0;
 	AllEnemyCount = 0;
-	MinSpawnNum = 2;
-	MaxSpawnNum = 3;
+	MinSpawnNum = 5;
+	MaxSpawnNum = 10;
 	PreviousMinutes = 0;
 	LocalElapsedTime = 0.0f;
 	bIsTimesUp = false;
@@ -534,6 +528,30 @@ void AShadow_of_the_DesertGameState::GoMainMenu()
 	if (AShadow_of_the_DesertGameMode* GameMode = Cast<AShadow_of_the_DesertGameMode>(GetWorld()->GetAuthGameMode()))
 	{
 		GameMode->ShowMainMenu();
+	}
+}
+
+void AShadow_of_the_DesertGameState::GoMenual()
+{
+	if (!MenualWidgetClass) return;
+
+	if (!MenualWidget)
+	{
+		// 위젯 생성
+		MenualWidget = CreateWidget<UUserWidget>(GetWorld(), MenualWidgetClass);
+		if (MenualWidget)
+		{
+			MenualWidget->AddToViewport(10);
+		}
+	}
+}
+
+void AShadow_of_the_DesertGameState::CloseMenual()
+{
+	if (MenualWidget)
+	{
+		MenualWidget->RemoveFromParent();
+		MenualWidget = nullptr; // 포인터 초기화
 	}
 }
 

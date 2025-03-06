@@ -3,7 +3,7 @@
 ASniper::ASniper()
 {
 	//Ω∫≈»
-	AttackDamage = 50.0f;
+	AttackDamage = 9999.0f;
 	CurrentAmmo = 5;
 	MaxAmmo = 5;
 	bIsReloading = false;

@@ -43,7 +43,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> EndMenuWidgetClass;
 
-	
+	// 조작법 설명창
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> MenualWidgetClass;
 
 	// 제한 시간 지났는지, 플레이어 사망 여부
 	bool bIsTimesUp;
@@ -78,6 +80,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GameFlow")
 	void GoMainMenu();
 
+	UFUNCTION(BlueprintCallable, Category = "GameFlow")
+	void GoMenual();
+
+	UFUNCTION(BlueprintCallable, Category = "GameFlow")
+	void CloseMenual();
+
 	void SetDamage(int32 Damage);
 	void SetTakenDamage(int32 Damage);
 	void CheckTimesUp();
@@ -100,6 +108,7 @@ private:
 	int32 RoundScore;
 	UUserWidget* PauseMenuWidget;
 	UUserWidget* EndMenuWidget;
+	UUserWidget* MenualWidget;
 
 	// HUD 위젯
 	AHUD* HUDInstance;
