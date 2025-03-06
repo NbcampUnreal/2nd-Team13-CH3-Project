@@ -39,11 +39,20 @@ public:
 	float GetMaxHelth();
 	AWeaponBase* Weapon;
 
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	bool Ues_Rifle_now;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	bool Ues_Sniper_now;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	bool Ues_Rocket_now;
+
 	virtual float TakeDamage(float DamageAmount,
 		struct FDamageEvent const& DamageEvent,
 		AController* EventInstigator,
 		AActor* DamageCauser) override;
 	void EquipWeapon(TSubclassOf<AWeaponBase> WeaponClass);
+
+	AWeaponBase* GetEquippedWeapon();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
@@ -65,12 +74,6 @@ protected:
 	float MaxDefensive;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Defensive")
 	float Defensive;
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
-	bool Ues_Rifle_now;
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
-	bool Ues_Sniper_now;
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
-	bool Ues_Rocket_now;
 
 	
 	void BeginPlay() override;

@@ -3,7 +3,13 @@
 
 #include "EnemyCharacterAi.h"
 #include "EnemyAIController.h"
+#include "CustomHUD.h"
 #include "../Shadow_of_the_DesertCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Blueprint/UserWidget.h"
+#include "DamageTextWidget.h"
+#include "Components/TextBlock.h"
+#include "Camera/PlayerCameraManager.h"
 
 // Sets default values
 AEnemyCharacterAi::AEnemyCharacterAi()
@@ -36,7 +42,34 @@ AEnemyCharacterAi::AEnemyCharacterAi()
 	hitBoxCollision->SetupAttachment(RootComponent);
 
 	hitBoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	hitBoxCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
+	hitBoxCollision->SetCollisionResponseToAllChannels(ECR_Overlap);	
+}
+
+void AEnemyCharacterAi::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (!DamageTextWidgetClass)
+	{
+		// 블루프린트 클래스를 런타임에 로드
+		DamageTextWidgetClass = LoadClass<UDamageTextWidget>(nullptr, TEXT("/Game/UI/Widgets/WBP_DamageText.WBP_DamageText_C"));
+	}
+
+	USkeletalMeshComponent* meshComp = GetMesh();
+	if (meshComp)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("find mesh"));
+		originMaterial = meshComp->CreateAndSetMaterialInstanceDynamic(0);
+
+		hitMaterial = UMaterialInstanceDynamic::Create(originMaterial->GetMaterial(), this);
+		if (hitMaterial)
+		{
+			//meshComp->SetMaterial(0, hitMaterial);
+			//UE_LOG(LogTemp, Warning, TEXT("set hit material"));
+			//hitMaterial->SetVectorParameterValue("BaseColor", FLinearColor::Red);
+			hitMaterial->SetVectorParameterValue("BaseColor", FLinearColor::Red);
+		}
+	}
 }
 
 void AEnemyCharacterAi::EnemyAttack()
@@ -100,19 +133,50 @@ void AEnemyCharacterAi::DisableAttackCollision()
 void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 {
 	currentHp -= damage;
-	if (currentHp <= 0&&!isDead)
+	/*
+	if (!isDead)
 	{
-		PlayDeadAnimation();
-		AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());		
-		if (gameState)
+		SetHitMaterial();
+	}*/
+
+	AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());
+	if (gameState)
+	{
+		gameState->SetDamage(damage);
+	
+		// 적 머리 위에 데미지 숫자 표시
+		ShowDamageText(static_cast<int32>(damage));
+
+		// 히트마커 표시 (적이 맞았을 때)
+		APlayerController* PlayerController = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		if (PlayerController)
 		{
-			gameState->KillEnemy(scorePoint);
+			ACustomHUD* HUD = Cast<ACustomHUD>(PlayerController->GetHUD());
+			if (HUD)
+			{
+				HUD->ShowHitmarker(); // 히트마커 활성화
+			}
 		}
-		UnpossessAI();
-		isDead = true;
-		FTimerHandle delayTime;
-		GetWorld()->GetTimerManager().SetTimer(delayTime, this, &AEnemyCharacterAi::EnemyDespawn, 5.0f, false);
-	}
+	
+		if (currentHp <= 0&&!isDead)
+		{
+			// 킬마커 표시 (적이 죽었을 때)
+			if (PlayerController)
+			{
+				ACustomHUD* HUD = Cast<ACustomHUD>(PlayerController->GetHUD());
+				if (HUD)
+				{
+					HUD->ShowKillmarker(); // 킬마커 활성화
+				}
+			}
+			PlayDeadAnimation();
+			gameState->KillEnemy(scorePoint);
+			UnpossessAI();
+			isDead = true;
+			FTimerHandle delayTime;
+			GetWorld()->GetTimerManager().SetTimer(delayTime, this, &AEnemyCharacterAi::EnemyDespawn, 5.0f, false);
+		}
+	}	
 }
 
 void AEnemyCharacterAi::EnemyDespawn()
@@ -158,7 +222,6 @@ void AEnemyCharacterAi::ApplyDamage()
 
 float AEnemyCharacterAi::GetAtkPower()
 {
-//	UE_LOG(LogTemp, Warning, TEXT("%.2f"), attackPower);
 	return attackPower;
 }
 
@@ -169,5 +232,60 @@ void AEnemyCharacterAi::UnpossessAI()
 	if (aiCtl)
 	{
 		aiCtl->UnPossess();
+	}
+}
+
+void AEnemyCharacterAi::ShowDamageText(int32 Damage)
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC) return;
+
+	// WBP_DamageText 블루프린트 UI 위젯 생성
+	UUserWidget* DamageWidget = CreateWidget<UUserWidget>(PC, LoadClass<UUserWidget>(nullptr, TEXT("/Game/UI/Widgets/WBP_DamageText.WBP_DamageText_C")));
+	if (!DamageWidget) return;
+
+	// 텍스트 설정
+	UTextBlock* DamageText = Cast<UTextBlock>(DamageWidget->GetWidgetFromName(TEXT("DamageText")));
+	if (DamageText)
+	{
+		DamageText->SetText(FText::FromString(FString::Printf(TEXT("%d"), Damage)));
+	}
+
+	// 적 위치를 가져와서 머리 위로 조정
+	FVector WorldLocation = GetActorLocation() + FVector(0, 0, 100);
+
+	// 월드 좌표 → 스크린 좌표 변환
+	FVector2D ScreenPosition;
+	if (!PC->ProjectWorldLocationToScreen(WorldLocation, ScreenPosition)) return;
+
+	// 위젯을 뷰포트에 추가
+	DamageWidget->AddToViewport();
+
+	// 해상도 독립적인 위치 적용 (SetRenderTranslation)
+	UWidget* RootWidget = DamageWidget->GetRootWidget();
+	if (RootWidget)
+	{
+		RootWidget->SetRenderTranslation(ScreenPosition);
+	}
+}
+
+void AEnemyCharacterAi::SetHitMaterial()
+{
+	if (GetMesh() && hitMaterial)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("red material"));
+		FTimerHandle resetTimer;
+		GetMesh()->SetMaterial(0, hitMaterial);
+
+		GetWorld()->GetTimerManager().SetTimer(resetTimer, this, &AEnemyCharacterAi::ResetMaterial, 0.3f, false);
+	}
+}
+
+void AEnemyCharacterAi::ResetMaterial()
+{
+	if (GetMesh() && originMaterial)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("reset material"));
+		GetMesh()->SetMaterial(0, originMaterial);
 	}
 }
