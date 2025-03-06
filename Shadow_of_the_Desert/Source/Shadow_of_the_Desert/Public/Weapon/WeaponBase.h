@@ -22,7 +22,15 @@ public:
     virtual void UpgradeReloadTime();
     void CancelReload();
 
-
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stat")
+    bool bIsReloading; // 리로드 중인지 여부
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+    bool bCanAttack = true;
+    FTimerHandle AttackCooldownHandle;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stat")
+    int32 CurrentAmmo;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stat")
+    int32 MaxAmmo;//최대 장전 탄창 수
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "WeaponMesh")
     UStaticMeshComponent* WeaponMesh;
@@ -33,12 +41,6 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stat")
     float AttackDamage;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stat")
-    int32 CurrentAmmo;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stat")
-    int32 MaxAmmo;//최대 장전 탄창 수
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stat")
-    bool bIsReloading; // 리로드 중인지 여부
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Stat")
     float ReloadTime; // 재장전 시간
     FTimerHandle ReloadTimerHandle;//재장전 타이머

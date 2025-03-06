@@ -183,7 +183,6 @@ void AShadow_of_the_DesertCharacter::Move(const FInputActionValue& Value)
 
 void AShadow_of_the_DesertCharacter::Look(const FInputActionValue& Value)
 {
-	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
@@ -228,8 +227,7 @@ void AShadow_of_the_DesertCharacter::Shot(const FInputActionValue& value)
 {
 	if (EquippedWeapon)
 	{
-		// ����� ����
-		EquippedWeapon->Attack(); // ������ Attack() �Լ� ȣ��
+		EquippedWeapon->Attack();
 	}
 	else
 	{
@@ -242,8 +240,7 @@ void AShadow_of_the_DesertCharacter::Reload(const FInputActionValue& value)
 {
 	if (EquippedWeapon)
 	{
-		// ����� ����
-		EquippedWeapon->Reload(); // ������ Attack() �Լ� ȣ��
+		EquippedWeapon->Reload();
 	}
 	else
 	{
@@ -252,7 +249,7 @@ void AShadow_of_the_DesertCharacter::Reload(const FInputActionValue& value)
 }
 void AShadow_of_the_DesertCharacter::Swap_Rifle(const FInputActionValue& value)
 {
-	EquipWeapon(RifleClass); // RifleClass�� TSubclassOf<AWeaponBase>�� ����Ǿ� �־�� �մϴ�.
+	EquipWeapon(RifleClass);
 	Ues_Rifle_now = true;
 	Ues_Sniper_now = false;
 	Ues_Rocket_now = false;
@@ -260,7 +257,7 @@ void AShadow_of_the_DesertCharacter::Swap_Rifle(const FInputActionValue& value)
 
 void AShadow_of_the_DesertCharacter::Swap_Sinper(const FInputActionValue& value)
 {
-	EquipWeapon(SniperClass); // SniperClass�� ���������� ���� �ʿ�
+	EquipWeapon(SniperClass);
 	Ues_Rifle_now = false;
 	Ues_Sniper_now = true;
 	Ues_Rocket_now = false;
@@ -268,7 +265,7 @@ void AShadow_of_the_DesertCharacter::Swap_Sinper(const FInputActionValue& value)
 
 void AShadow_of_the_DesertCharacter::Swap_Rocket(const FInputActionValue& value)
 {
-	EquipWeapon(RocketLauncherClass); // RocketLauncherClass�� �ʿ�
+	EquipWeapon(RocketLauncherClass);
 	Ues_Rifle_now = false;
 	Ues_Sniper_now = false;
 	Ues_Rocket_now = true;
@@ -308,40 +305,39 @@ void AShadow_of_the_DesertCharacter::EquipWeapon(TSubclassOf<AWeaponBase> Weapon
 	{
 		if (EquippedWeapon)
 		{
-			EquippedWeapon->Destroy(); // ���� ���� ����
-			EquippedWeapon = nullptr;  // ������ �ʱ�ȭ
+			if (EquippedWeapon->bIsReloading)
+			{
+				EquippedWeapon->CancelReload();
+			}
+			EquippedWeapon->Destroy(); 
+			EquippedWeapon = nullptr; 
 		}
 
-		// ���⸦ ����
-		EquippedWeapon = GetWorld()->SpawnActor<AWeaponBase>(WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator);
-		UE_LOG(LogTemp, Warning, TEXT("Weapon class: %s"), *WeaponClass->GetName()); // ���� Ŭ���� �α� ���
+		EquippedWeapon = GetWorld()->SpawnActor<AWeaponBase>(WeaponClass);
+		UE_LOG(LogTemp, Warning, TEXT("Weapon class: %s"), *WeaponClass->GetName());
 
 		if (EquippedWeapon)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Weapon equipped: %s"), *EquippedWeapon->GetName());
+			EquippedWeapon->bCanAttack = false;
+
+			GetWorld()->GetTimerManager().SetTimer(
+				EquippedWeapon->AttackCooldownHandle,
+				[this]() {
+					if (EquippedWeapon)
+						EquippedWeapon->bCanAttack = true;
+				},
+				1.0f, // Delay
+				false
+			);
 
 			USkeletalMeshComponent* SkeletalMesh = GetMesh();
 			if (SkeletalMesh)
 			{
-				// ���⸦ �޼� ���Ͽ� ����
 				EquippedWeapon->AttachToComponent(SkeletalMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_l"));
 
 				FRotator NewRotation = GetActorRotation();
 				EquippedWeapon->SetActorRotation(NewRotation + FRotator(0.0f, 0.0f, 0.0f));
-				/*// ĳ������ ĸ�� ������Ʈ ���� ��ġ ���
-				FVector ForwardVector = GetActorForwardVector(); // ĳ������ �� ����
-				FVector SpawnLocation = GetCapsuleComponent()->GetComponentLocation() + ForwardVector * 100.0f; // ĸ�� �������� 100 ���� �̵�
-
-				// ���⸦ ���ο� ��ġ�� ����
-				EquippedWeapon->SetActorLocation(SpawnLocation);
-				EquippedWeapon->SetActorRotation(GetActorRotation()); // ĳ������ ȸ���� �����ϰ� ����
-
-				// ���⸦ ĸ�� ������Ʈ�� ����
-				UCapsuleComponent* Capsule = GetCapsuleComponent(); // ĳ������ ĸ�� ������Ʈ ��������
-				if (Capsule)
-				{
-					EquippedWeapon->AttachToComponent(Capsule, FAttachmentTransformRules::KeepRelativeTransform);
-				}*/
 			}
 		}
 	}

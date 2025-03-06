@@ -3,7 +3,13 @@
 
 #include "EnemyCharacterAi.h"
 #include "EnemyAIController.h"
+#include "CustomHUD.h"
 #include "../Shadow_of_the_DesertCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Blueprint/UserWidget.h"
+#include "DamageTextWidget.h"
+#include "Components/TextBlock.h"
+#include "Camera/PlayerCameraManager.h"
 
 // Sets default values
 AEnemyCharacterAi::AEnemyCharacterAi()
@@ -36,7 +42,46 @@ AEnemyCharacterAi::AEnemyCharacterAi()
 	hitBoxCollision->SetupAttachment(RootComponent);
 
 	hitBoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	hitBoxCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
+	hitBoxCollision->SetCollisionResponseToAllChannels(ECR_Overlap);	
+}
+
+void AEnemyCharacterAi::BeginPlay()
+{
+	Super::BeginPlay();
+	USkeletalMeshComponent* meshComp = GetMesh();
+	if (meshComp)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("find mesh"));
+		originMaterial = meshComp->CreateAndSetMaterialInstanceDynamic(0);
+
+		hitMaterial = UMaterialInstanceDynamic::Create(originMaterial->GetMaterial(), this);
+		if (hitMaterial)
+		{
+			//meshComp->SetMaterial(0, hitMaterial);
+			//UE_LOG(LogTemp, Warning, TEXT("set hit material"));
+			//hitMaterial->SetVectorParameterValue("BaseColor", FLinearColor::Red);
+			hitMaterial->SetVectorParameterValue("BaseColor", FLinearColor::Red);
+		}
+	}
+}
+
+void AEnemyCharacterAi::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (!DamageTextWidgetClass)
+	{
+		// 블루프린트 클래스를 런타임에 로드
+		DamageTextWidgetClass = LoadClass<UDamageTextWidget>(nullptr, TEXT("/Game/UI/Widgets/WBP_DamageText.WBP_DamageText_C"));
+		if (!DamageTextWidgetClass)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to load WBP_DamageText!"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Successfully loaded WBP_DamageText!"));
+		}
+	}
 }
 
 void AEnemyCharacterAi::EnemyAttack()
@@ -100,20 +145,51 @@ void AEnemyCharacterAi::DisableAttackCollision()
 void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 {
 	currentHp -= damage;
+
+	//UE_LOG(LogTemp, Warning, TEXT("try red material"));
+/*	if (!isDead)
+	{
+		SetHitMaterial();
+	}*/
+
 	AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());
 	if (gameState)
 	{
 		gameState->SetDamage(damage);
+	
+		// 적 머리 위에 데미지 숫자 표시
+		ShowDamageText(static_cast<int32>(damage));
+
+		// 히트마커 표시 (적이 맞았을 때)
+		APlayerController* PlayerController = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		if (PlayerController)
+		{
+			ACustomHUD* HUD = Cast<ACustomHUD>(PlayerController->GetHUD());
+			if (HUD)
+			{
+				HUD->ShowHitmarker(); // 히트마커 활성화
+			}
+		}
+	
 		if (currentHp <= 0&&!isDead)
 		{
-			PlayDeadAnimation();
+			// 킬마커 표시 (적이 죽었을 때)
+			if (PlayerController)
+			{
+				ACustomHUD* HUD = Cast<ACustomHUD>(PlayerController->GetHUD());
+				if (HUD)
+				{
+					HUD->ShowKillmarker(); // 킬마커 활성화
+				}
+			}
+				PlayDeadAnimation();
 			gameState->KillEnemy(scorePoint);
 			UnpossessAI();
 			isDead = true;
 			FTimerHandle delayTime;
 			GetWorld()->GetTimerManager().SetTimer(delayTime, this, &AEnemyCharacterAi::EnemyDespawn, 5.0f, false);
 		}
-	}
+	}	
 }
 
 void AEnemyCharacterAi::EnemyDespawn()
@@ -170,5 +246,58 @@ void AEnemyCharacterAi::UnpossessAI()
 	if (aiCtl)
 	{
 		aiCtl->UnPossess();
+	}
+}
+
+void AEnemyCharacterAi::ShowDamageText(int32 Damage)
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PlayerController is NULL!"));
+		return;
+	}
+
+	// WBP_DamageText 블루프린트 UI 위젯 생성
+	UUserWidget* DamageWidget = CreateWidget<UUserWidget>(PC, LoadClass<UUserWidget>(nullptr, TEXT("/Game/UI/Widgets/WBP_DamageText.WBP_DamageText_C")));
+	if (!DamageWidget)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to create WBP_DamageText!"));
+		return;
+	}
+
+	// 위젯 내부에서 "DamageText"라는 이름의 TextBlock 찾기
+	UTextBlock* DamageText = Cast<UTextBlock>(DamageWidget->GetWidgetFromName(TEXT("DamageText")));
+	if (DamageText)
+	{
+		DamageText->SetText(FText::FromString(FString::Printf(TEXT("%d"), Damage)));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to find DamageText in WBP_DamageText!"));
+	}
+
+	// 위젯을 화면에 추가
+	DamageWidget->AddToViewport();
+}
+
+void AEnemyCharacterAi::SetHitMaterial()
+{
+	if (GetMesh() && hitMaterial)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("red material"));
+		FTimerHandle resetTimer;
+		GetMesh()->SetMaterial(0, hitMaterial);
+
+		GetWorld()->GetTimerManager().SetTimer(resetTimer, this, &AEnemyCharacterAi::ResetMaterial, 0.3f, false);
+	}
+}
+
+void AEnemyCharacterAi::ResetMaterial()
+{
+	if (GetMesh() && originMaterial)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("reset material"));
+		GetMesh()->SetMaterial(0, originMaterial);
 	}
 }
