@@ -85,6 +85,4 @@ protected:
 	USphereComponent* attackCollision;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Collision")
 	UCapsuleComponent* hitBoxCollision;
-
-	virtual void BeginPlay() override;
 };
