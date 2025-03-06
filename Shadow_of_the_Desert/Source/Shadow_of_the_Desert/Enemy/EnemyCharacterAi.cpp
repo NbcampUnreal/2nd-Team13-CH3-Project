@@ -3,7 +3,13 @@
 
 #include "EnemyCharacterAi.h"
 #include "EnemyAIController.h"
+#include "CustomHUD.h"
 #include "../Shadow_of_the_DesertCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Blueprint/UserWidget.h"
+#include "DamageTextWidget.h"
+#include "Components/TextBlock.h"
+#include "Camera/PlayerCameraManager.h"
 
 // Sets default values
 AEnemyCharacterAi::AEnemyCharacterAi()
@@ -37,6 +43,25 @@ AEnemyCharacterAi::AEnemyCharacterAi()
 
 	hitBoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	hitBoxCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
+}
+
+void AEnemyCharacterAi::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (!DamageTextWidgetClass)
+	{
+		// 블루프린트 클래스를 런타임에 로드
+		DamageTextWidgetClass = LoadClass<UDamageTextWidget>(nullptr, TEXT("/Game/UI/Widgets/WBP_DamageText.WBP_DamageText_C"));
+		if (!DamageTextWidgetClass)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to load WBP_DamageText!"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Successfully loaded WBP_DamageText!"));
+		}
+	}
 }
 
 void AEnemyCharacterAi::EnemyAttack()
@@ -104,8 +129,33 @@ void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 	if (gameState)
 	{
 		gameState->SetDamage(damage);
+
+		// 적 머리 위에 데미지 숫자 표시
+		ShowDamageText(static_cast<int32>(damage));
+
+		// 히트마커 표시 (적이 맞았을 때)
+		APlayerController* PlayerController = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		if (PlayerController)
+		{
+			ACustomHUD* HUD = Cast<ACustomHUD>(PlayerController->GetHUD());
+			if (HUD)
+			{
+				HUD->ShowHitmarker(); // 히트마커 활성화
+			}
+		}
+
 		if (currentHp <= 0&&!isDead)
 		{
+			// 킬마커 표시 (적이 죽었을 때)
+			if (PlayerController)
+			{
+				ACustomHUD* HUD = Cast<ACustomHUD>(PlayerController->GetHUD());
+				if (HUD)
+				{
+					HUD->ShowKillmarker(); // 킬마커 활성화
+				}
+			}
+
 			PlayDeadAnimation();
 			gameState->KillEnemy(scorePoint);
 			UnpossessAI();
@@ -172,3 +222,36 @@ void AEnemyCharacterAi::UnpossessAI()
 		aiCtl->UnPossess();
 	}
 }
+
+void AEnemyCharacterAi::ShowDamageText(int32 Damage)
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PC)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PlayerController is NULL!"));
+		return;
+	}
+
+	// WBP_DamageText 블루프린트 UI 위젯 생성
+	UUserWidget* DamageWidget = CreateWidget<UUserWidget>(PC, LoadClass<UUserWidget>(nullptr, TEXT("/Game/UI/Widgets/WBP_DamageText.WBP_DamageText_C")));
+	if (!DamageWidget)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to create WBP_DamageText!"));
+		return;
+	}
+
+	// 위젯 내부에서 "DamageText"라는 이름의 TextBlock 찾기
+	UTextBlock* DamageText = Cast<UTextBlock>(DamageWidget->GetWidgetFromName(TEXT("DamageText")));
+	if (DamageText)
+	{
+		DamageText->SetText(FText::FromString(FString::Printf(TEXT("%d"), Damage)));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Failed to find DamageText in WBP_DamageText!"));
+	}
+
+	// 위젯을 화면에 추가
+	DamageWidget->AddToViewport();
+}
+
