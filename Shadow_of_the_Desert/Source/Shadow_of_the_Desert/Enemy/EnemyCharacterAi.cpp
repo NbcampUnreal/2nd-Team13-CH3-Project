@@ -141,11 +141,11 @@ void AEnemyCharacterAi::DisableAttackCollision()
 void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 {
 	currentHp -= damage;
-
+	/*
 	if (!isDead)
 	{
 		SetHitMaterial();
-	}
+	}*/
 
 	AShadow_of_the_DesertGameState* gameState = Cast<AShadow_of_the_DesertGameState>(GetWorld()->GetGameState());
 	if (gameState)
