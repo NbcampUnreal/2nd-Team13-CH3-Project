@@ -56,7 +56,7 @@ protected:
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
 	TSubclassOf<ARocketLauncher> RocketLauncherClass;
-
+	bool bIsfirst;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Health")
 	float MaxHealth;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Health")

@@ -7,10 +7,10 @@ ARifle::ARifle()
 
 	//Ω∫≈»
 	AttackDamage = 5.0f;
-	CurrentAmmo = 30;
-	MaxAmmo = 30;
+	MaxAmmo = 90;
+	CurrentAmmo = MaxAmmo;
 	bIsReloading = false;
-	AttackRate = 0.2f;
+	AttackRate = 0.05f;
 	ReloadTime = 1.5f;
 	SpreadAngle = 0.01f;
 

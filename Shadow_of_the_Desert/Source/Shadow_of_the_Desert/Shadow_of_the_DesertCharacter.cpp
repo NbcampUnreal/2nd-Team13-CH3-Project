@@ -64,6 +64,7 @@ AShadow_of_the_DesertCharacter::AShadow_of_the_DesertCharacter()
 
 	MaxHealth = 100.0f;
 	Health = MaxHealth;
+	bIsfirst = true;
 
 	Ues_Rifle_now = true;
 	Ues_Sniper_now = false;
@@ -302,14 +303,21 @@ void AShadow_of_the_DesertCharacter::EquipWeapon(TSubclassOf<AWeaponBase> Weapon
 {
 	if (WeaponClass)
 	{
+		if (EquippedWeapon && EquippedWeapon->IsA(WeaponClass))
+		{
+			return;
+		}
+
+		int32 PreviousAmmo = 0;
 		if (EquippedWeapon)
 		{
 			if (EquippedWeapon->bIsReloading)
 			{
 				EquippedWeapon->CancelReload();
 			}
+			PreviousAmmo = EquippedWeapon->CurrentAmmo;
 			EquippedWeapon->Destroy(); 
-			EquippedWeapon = nullptr; 
+			EquippedWeapon = nullptr;
 		}
 
 		EquippedWeapon = GetWorld()->SpawnActor<AWeaponBase>(WeaponClass);
@@ -329,6 +337,16 @@ void AShadow_of_the_DesertCharacter::EquipWeapon(TSubclassOf<AWeaponBase> Weapon
 				1.0f, // Delay
 				false
 			);
+
+			if (!bIsfirst)
+			{
+				EquippedWeapon->CurrentAmmo = PreviousAmmo;
+			}
+			else
+			{
+				EquippedWeapon->CurrentAmmo = EquippedWeapon->MaxAmmo;
+				bIsfirst = false;
+			}
 
 			USkeletalMeshComponent* SkeletalMesh = GetMesh();
 			if (SkeletalMesh)

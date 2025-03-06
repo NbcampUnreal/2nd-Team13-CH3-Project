@@ -2,7 +2,7 @@
 
 ANomalBullet::ANomalBullet()
 {
-	Speed = 3000.0f;
+	Speed = 5000.0f;
 	BulletDamage = 0.0f;
 }
 
