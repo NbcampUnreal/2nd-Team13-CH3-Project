@@ -113,19 +113,19 @@
     - **이재성**:
    
 
-메인 메뉴 화면 및 버튼 추가
+메인 메뉴 화면 및 버튼 추가 ⬇
 
 ![메인메뉴화면](https://github.com/user-attachments/assets/8d9c0105-e512-40bd-a5a8-b1a005203ffa)
 
-조작법 UI 구현
+조작법 UI 구현 ⬇
 
 ![조작법화면](https://github.com/user-attachments/assets/12b9b53e-adae-4550-b720-71942c40a6d8)
 
-일시정지 화면 추가
+일시정지 화면 추가 ⬇
 
 ![일시정지화면](https://github.com/user-attachments/assets/5378a473-092b-401a-811c-fe5a528e6946)
 
-게임 클리어 & 게임 오버 화면 추가
+게임 클리어 & 게임 오버 화면 추가 ⬇
 
 ![클리어화면](https://github.com/user-attachments/assets/e5154619-0f16-466e-8a96-97dbd4d93404)
 
