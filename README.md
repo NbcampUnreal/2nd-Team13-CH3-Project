@@ -113,7 +113,7 @@
     - **이재성**:
    
 
-메인 메뉴 화면 및 버튼 추가 ⬇
+⬇ **메인 메뉴 화면 및 버튼 추가** ⬇
 
 ![메인메뉴화면](https://github.com/user-attachments/assets/8d9c0105-e512-40bd-a5a8-b1a005203ffa)
 
