@@ -101,10 +101,11 @@
 
 - `Shadow_of_the_DesertGameInstance.cpp`
   - 게임 전반의 데이터를 저장 및 관리
-  - 플레이어의 총 점수, 라운드 진행 상황 추적
 - `Shadow_of_the_DesertGameState.cpp`
   - 웨이브 기반 점수 관리 및 적 카운트 추적
   - `KillEnemy()`를 호출하여 점수 증가 처리
+  - HUD에 표기되는 실제 DATA관리
+  - Menu의 각종 버튼 이벤트 관리
 
 ## 🌟 추가 구현 사항
 - **UI 및 게임 흐름 개선**:
