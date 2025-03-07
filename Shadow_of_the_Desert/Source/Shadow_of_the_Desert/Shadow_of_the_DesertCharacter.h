@@ -3,14 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "../Public/Weapon/WeaponBase.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "Weapon/Rifle.h"
+#include "Weapon/Sniper.h"
+#include "Weapon/RocketLauncher.h"
 #include "Shadow_of_the_DesertCharacter.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+class AWeaponBase;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -27,42 +32,92 @@ class AShadow_of_the_DesertCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
-	
-	/** MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputMappingContext* DefaultMappingContext;
-
-	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* JumpAction;
-
-	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* MoveAction;
-
-	/** Look Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* LookAction;
 
 public:
 	AShadow_of_the_DesertCharacter();
-	
+	float GetHelth();
+	float GetMaxHelth();
+	AWeaponBase* Weapon;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	bool Ues_Rifle_now;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	bool Ues_Sniper_now;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	bool Ues_Rocket_now;
+
+	virtual float TakeDamage(float DamageAmount,
+		struct FDamageEvent const& DamageEvent,
+		AController* EventInstigator,
+		AActor* DamageCauser) override;
+	void EquipWeapon(TSubclassOf<AWeaponBase> WeaponClass);
+
+	AWeaponBase* GetEquippedWeapon();
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	AWeaponBase* EquippedWeapon;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	TSubclassOf<ARifle> RifleClass;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	TSubclassOf<ASniper> SniperClass;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Weapon")
+	TSubclassOf<ARocketLauncher> RocketLauncherClass;
+	bool bIsfirst;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Health")
+	float MaxHealth;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Health")
+	float Health;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Defensive")
+	float MaxDefensive;
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Defensive")
+	float Defensive;
+
+	
+	void BeginPlay() override;
 
 	/** Called for movement input */
+	UFUNCTION()
 	void Move(const FInputActionValue& Value);
 
 	/** Called for looking input */
+	UFUNCTION()
 	void Look(const FInputActionValue& Value);
-			
+	UFUNCTION()
+	void StartJump(const FInputActionValue& value);
+	UFUNCTION()
+	void StopJump(const FInputActionValue& value);
+	UFUNCTION()
+	void StartSprint(const FInputActionValue& value);
+	UFUNCTION()
+	void StopSprint(const FInputActionValue& value);
+	UFUNCTION()
+	void Shot(const FInputActionValue& value);
+	UFUNCTION()
+	void Reload(const FInputActionValue& value);
+	UFUNCTION()
+	void Swap_Rifle(const FInputActionValue& value);
+	UFUNCTION()
+	void Swap_Sinper(const FInputActionValue& value);
+	UFUNCTION()
+	void Swap_Rocket(const FInputActionValue& value);
 
-protected:
+
+
 
 	virtual void NotifyControllerChanged() override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+private:
+	float Speed;
+	float SprintSpeedMultiplier;
+	float SprintSpeed;
+	int32 RifleAmmo = 90;
+	int32 SniperAmmo = 5;
+	int32 RocketLauncherAmmo = 1;
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }

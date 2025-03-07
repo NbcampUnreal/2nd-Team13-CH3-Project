@@ -6,3 +6,6 @@ Shadow_of_the_Desert/*.jpg   filter=lfs diff=lfs merge=lfs -text
 Shadow_of_the_Desert/*.jpeg  filter=lfs diff=lfs merge=lfs -text
 Shadow_of_the_Desert/*.tga   filter=lfs diff=lfs merge=lfs -text
 Shadow_of_the_Desert/*.exr   filter=lfs diff=lfs merge=lfs -text
+
+Shadow_of_the_Desert/*.cpp text eol=lf encoding=UTF-8
+Shadow_of_the_Desert/*.h text eol=lf encoding=UTF-8
