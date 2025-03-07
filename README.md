@@ -66,11 +66,14 @@
   - 플레이어 감지 및 추격 (`OnPerceptionUpdated` 사용)
   - 공격 충돌 감지 (`OnHit`)
   - 피격 시 피드백 제공 (히트마커, 데미지 UI)
-- `EnemyAIController.cpp`
-  - AI의 상태 전환 및 행동 제어
-  - 특정 행동 패턴 설정 (순찰, 전투 모드 전환)
-- `PatrolPath.cpp`
-  - AI가 지정된 경로를 따라 이동하도록 구현
+- `BP_EnemyControllerBase`
+  - Behavior Tree 를 이용해 AI의 상태 전환 및 행동 제어
+  - Enemy 캐릭터에 빙의하는 방식으로 AI 조종
+- `BT_EnemyBase`
+  - Enemy 상태에 따라 어떤 행동을 해야 하는지 정하는 행동 트리
+  - 순찰, 추격, 공격 등의 행동을 포함한다.
+- `BP_PatrolRoute`
+  - AI가 지정된 경로를 따라 왕복 반복 이동하도록 구현
   - `GetWayPoint()`를 사용하여 경로를 설정함
 
 ### 3. 무기 및 탄환 시스템
@@ -132,6 +135,12 @@
 
 ![패배화면](https://github.com/user-attachments/assets/ce7651f2-9e68-4377-b37d-e9f8ceca8083)
 
+
+- **Enemy**
+  - **김영빈**: 적이 공격 받았을시 Material 동적 변화로 상호작용 시각화 시도
+![ezgif-87bb49a94a17ac](https://github.com/user-attachments/assets/c6fc4ae1-457b-4e30-ab71-d6f42d538495)
+
+ 
 
 ## ⚠️ 주의사항
 
