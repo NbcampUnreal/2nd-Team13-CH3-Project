@@ -143,6 +143,9 @@ ShadowsOfTheDesert
 
 - 프로젝트는 **언리얼 엔진 5.5.3** 버전에 최적화되어 있습니다. 다른 버전에서는 정상 작동하지 않을 수 있습니다.
 - 그래픽 설정이 높은 경우 낮은 사양의 PC에서는 렉이 발생할 수 있습니다.
+- **알려진 버그**:
+  - 특정 구역에서 로켓런처를 발사하면 적에게 데미지가 들어가지 않음
+  - 데미지 텍스트 애니메이션이 전체화면에서만 정상적으로 표시되며, 그렇지 않은 경우 위치가 어긋남
 
 ## 👥 팀원 소개
 
@@ -167,3 +170,4 @@ ShadowsOfTheDesert
 
 
 ![jLXVRzis47_tfn1Ge70Jjm_Rsr0KLUnayHQdXfMqZm4ZdcqY5AbHL1mtstVVaITRf29bAx2z9EBlTppUdpl-yUVACcFhGevooQeg-PKLC5S8gXm2QA5vECmiiuVnTCiCoosOPhoKR0zcgfKrMieZ_0rOgLKpEAkHiStWN46nFsf9HGYdynUAbioDyU_se0osx55eOmt0Q1GwaBn_trhVV3](https://github.com/user-attachments/assets/87752f81-1891-4b05-add9-2711da619f32)
+
