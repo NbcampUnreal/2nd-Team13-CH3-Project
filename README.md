@@ -37,20 +37,7 @@
 
 ## 📂 프로젝트 구조
 
-```
-ShadowsOfTheDesert
- ┣ Source
- ┃ ┣ ShadowsOfTheDesert  # 메인 게임 로직
- ┃ ┃ ┣ Enemy  # 적 AI 관련 코드 (EnemyCharacterAi, EnemyAIController)
- ┃ ┃ ┣ Character  # 플레이어 캐릭터 관련 코드 (Shadow_of_the_DesertCharacter)
- ┃ ┃ ┣ Weapon  # 무기 시스템 및 탄환 관련 코드 (WeaponBase, BulletBase)
- ┃ ┃ ┣ UI  # 사용자 인터페이스 및 HUD (CustomHUD, DamageTextWidget)
- ┃ ┃ ┗ GameMode  # 게임 모드 및 상태 관리
- ┣ Config  # 게임 설정 파일
- ┣ Content  # 에셋 및 리소스
- ┣ Plugins  # 추가 플러그인
- ┗ README.md  # 프로젝트 설명
-```
+![jLXVRzis47_tfn1Ge70Jjm_Rsr0KLUnayHQdXfMqZm4ZdcqY5AbHL1mtstVVaITRf29bAx2z9EBlTppUdpl-yUVACcFhGevooQeg-PKLC5S8gXm2QA5vECmiiuVnTCiCoosOPhoKR0zcgfKrMieZ_0rOgLKpEAkHiStWN46nFsf9HGYdynUAbioDyU_se0osx55eOmt0Q1GwaBn_trhVV3](https://github.com/user-attachments/assets/87752f81-1891-4b05-add9-2711da619f32)
 
 ## 🏹 게임 플레이 방법
 
@@ -167,7 +154,3 @@ ShadowsOfTheDesert
 ![결과 창](./result_screen.png)
 
 ---
-
-
-![jLXVRzis47_tfn1Ge70Jjm_Rsr0KLUnayHQdXfMqZm4ZdcqY5AbHL1mtstVVaITRf29bAx2z9EBlTppUdpl-yUVACcFhGevooQeg-PKLC5S8gXm2QA5vECmiiuVnTCiCoosOPhoKR0zcgfKrMieZ_0rOgLKpEAkHiStWN46nFsf9HGYdynUAbioDyU_se0osx55eOmt0Q1GwaBn_trhVV3](https://github.com/user-attachments/assets/87752f81-1891-4b05-add9-2711da619f32)
-
