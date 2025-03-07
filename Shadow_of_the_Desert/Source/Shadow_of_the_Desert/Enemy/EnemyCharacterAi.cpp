@@ -150,11 +150,11 @@ void AEnemyCharacterAi::EnemyTakeDamage(const float damage)
 					}
 				}
 				PlayDeadAnimation();
-				gameState->KillEnemy(scorePoint);
-				UnpossessAI();
+				gameState->KillEnemy(scorePoint);				
 				isDead = true;
 				FTimerHandle delayTime;
 				GetWorld()->GetTimerManager().SetTimer(delayTime, this, &AEnemyCharacterAi::EnemyDespawn, 5.0f, false);
+				UnpossessAI();
 			}
 		}		
 	}	
@@ -209,7 +209,8 @@ void AEnemyCharacterAi::UnpossessAI()
 	AAIController* aiCtl = Cast<AAIController>(GetController());
 	if (aiCtl)
 	{
-		aiCtl->UnPossess();
+		aiCtl->Destroy();
+		aiCtl->UnPossess();		
 	}
 }
 
