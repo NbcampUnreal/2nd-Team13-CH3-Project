@@ -1,6 +1,7 @@
 #include "Weapon/WeaponBase.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/World.h"
+#include "Particles/ParticleSystemComponent.h"
 
 AWeaponBase::AWeaponBase()
 {
@@ -88,7 +89,6 @@ void AWeaponBase::Attack()
 			FVector Direction = (CameraRotation.Vector() + RandomOffset).GetSafeNormal();
 
 			APawn* CharacterInstigator = Cast<APawn>(GetOwner()); // 총알을 발사하는 캐릭터
-			UE_LOG(LogTemp, Warning, TEXT("Current Actor: %s"), *GetName());
 
 			ABulletBase* Bullet = GetWorld()->SpawnActor<ABulletBase>(BulletClass, WeaponLocation, FRotator::ZeroRotator);
 			if (Bullet)
@@ -96,10 +96,16 @@ void AWeaponBase::Attack()
 				Bullet->Initialize(Direction, AttackDamage, CharacterInstigator);
 			}
 			CurrentAmmo--;
-			UE_LOG(LogTemp, Warning, TEXT("END CurrentAmmo: %d, bIsReloading: %s, LastAttackTime: %f"),
-				CurrentAmmo, bIsReloading ? TEXT("true") : TEXT("false"),
-				LastAttackTime);
 			LastAttackTime = CurrentTime;
+
+			if (AttackSound)
+			{
+				UAudioComponent* AudioComponent = UGameplayStatics::SpawnSoundAtLocation(
+					GetWorld(),
+					AttackSound,
+					GetActorLocation()
+				);
+			}
 		}
 	}
 }

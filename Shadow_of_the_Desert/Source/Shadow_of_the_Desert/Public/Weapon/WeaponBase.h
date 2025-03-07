@@ -62,4 +62,6 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Upgrade")
     float ReloadTimeIncreaseRate;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon|Effects")
+    USoundBase* AttackSound;
 };
