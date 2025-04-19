@@ -58,7 +58,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy|Status")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Status")
 	float maxHp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Status")
 	float currentHp;
@@ -70,7 +70,7 @@ protected:
 	float attackSpeed;
 	bool isDead;
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<class UDamageTextWidget> DamageTextWidgetClass;	
+	TSubclassOf<UUserWidget> DamageTextWidgetClass;
 
 	UMaterialInstanceDynamic* originMaterial;
 	UMaterialInstanceDynamic* hitMaterial;
@@ -85,5 +85,5 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy|Collision")
 	UCapsuleComponent* hitBoxCollision;
 
-	
+
 };
