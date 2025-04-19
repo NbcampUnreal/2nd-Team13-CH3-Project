@@ -1,4 +1,4 @@
-# Shadows of the Desert
+# Shadows of the Desert (v1.0.1)
 
 ## 🏜 프로젝트 소개
 
@@ -38,6 +38,13 @@
 ## 📂 프로젝트 구조
 
 ![jLXVRzis47_tfn1Ge70Jjm_Rsr0KLUnayHQdXfMqZm4ZdcqY5AbHL1mtstVVaITRf29bAx2z9EBlTppUdpl-yUVACcFhGevooQeg-PKLC5S8gXm2QA5vECmiiuVnTCiCoosOPhoKR0zcgfKrMieZ_0rOgLKpEAkHiStWN46nFsf9HGYdynUAbioDyU_se0osx55eOmt0Q1GwaBn_trhVV3](https://github.com/user-attachments/assets/87752f81-1891-4b05-add9-2711da619f32)
+
+## ⚙ 버전 정보
+
+| 버전 | 날짜 | 주요 변경 내용 |
+|------|------|----------------|
+| 1.0.0 | 2025.03.07 | 프로젝트 초기 릴리즈 |
+| **1.0.1** | **2025.04.20** | **데미지 텍스트 색상, 위치 오류 수정 및 애니메이션 개선** |
 
 ## 🏹 게임 플레이 방법
 
@@ -109,6 +116,14 @@
   - `KillEnemy()`를 호출하여 점수 증가 처리
   - HUD에 표기되는 실제 DATA관리
   - Menu의 각종 버튼 이벤트 관리
+
+## 🆕 변경 사항 (v1.0.1)
+
+### ✅ 데미지 텍스트 시스템 개선
+- 다양한 해상도 환경에서 데미지 텍스트 위치가 어긋나던 문제를 해결하였습니다.
+- 각 데미지 수치에 따라 색상이 다르게 표시되도록 개선하였습니다.
+- 텍스트 등장 애니메이션을 더욱 역동적으로 리팩터링하였습니다.
+- 담당자: **이재성**
 
 ## 🌟 추가 구현 사항
 - **UI 및 게임 흐름 개선**:
