@@ -35,10 +35,6 @@
 4. `Build` 버튼을 눌러 프로젝트를 빌드합니다.
 5. `Play` 버튼을 눌러 게임을 실행합니다.
 
-## 📂 프로젝트 구조
-
-![jLXVRzis47_tfn1Ge70Jjm_Rsr0KLUnayHQdXfMqZm4ZdcqY5AbHL1mtstVVaITRf29bAx2z9EBlTppUdpl-yUVACcFhGevooQeg-PKLC5S8gXm2QA5vECmiiuVnTCiCoosOPhoKR0zcgfKrMieZ_0rOgLKpEAkHiStWN46nFsf9HGYdynUAbioDyU_se0osx55eOmt0Q1GwaBn_trhVV3](https://github.com/user-attachments/assets/87752f81-1891-4b05-add9-2711da619f32)
-
 ## ⚙ 버전 정보
 
 | 버전 | 날짜 | 주요 변경 내용 |
