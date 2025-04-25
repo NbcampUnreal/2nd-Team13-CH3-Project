@@ -221,7 +221,7 @@ void AEnemyCharacterAi::ShowDamageText(int32 Damage)
 		FLinearColor Color;
 		if (Damage < 100)
 		{
-			Color = FLinearColor(1.f, 1.f, 0.6f);;
+			Color = FLinearColor(1.f, 1.f, 0.6f);
 		}
 		else if (Damage < 1000)
 		{
