@@ -220,11 +220,21 @@ void AEnemyCharacterAi::ShowDamageText(int32 Damage)
 
 		FLinearColor Color;
 		if (Damage < 100)
+<<<<<<< HEAD
 			Color = FLinearColor(1.f, 1.f, 0.6f);
+=======
+		{
+			Color = FLinearColor(1.f, 1.f, 0.6f);
+		}
+>>>>>>> UI
 		else if (Damage < 1000)
+		{
 			Color = FLinearColor(1.f, 0.5f, 0.f);
+		}
 		else
+		{
 			Color = FLinearColor(1.f, 0.2f, 0.2f);
+		}
 
 		DamageText->SetColorAndOpacity(FSlateColor(Color));
 	}
