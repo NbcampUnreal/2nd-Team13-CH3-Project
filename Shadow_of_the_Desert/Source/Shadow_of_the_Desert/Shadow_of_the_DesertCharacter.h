@@ -74,7 +74,8 @@ protected:
 	float MaxDefensive;
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "Defensive")
 	float Defensive;
-
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Input")
+	float MouseSensitivity = 1.0f;
 	
 	void BeginPlay() override;
 

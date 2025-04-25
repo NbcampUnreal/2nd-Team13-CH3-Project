@@ -9,7 +9,7 @@
 class AHUD;
 
 /**
- * 
+ *
  */
 UCLASS()
 class SHADOW_OF_THE_DESERT_API AShadow_of_the_DesertGameState : public AGameState
@@ -18,39 +18,43 @@ class SHADOW_OF_THE_DESERT_API AShadow_of_the_DesertGameState : public AGameStat
 public:
 	AShadow_of_the_DesertGameState();
 
-	// ÀûÀ» Á×ÀÎ È½¼ö, ÀûÀÇ ÃÑ ¼ö
+	// ì ì„ ì£½ì¸ íšŸìˆ˜, ì ì˜ ì´ ìˆ˜
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Enemy")
 	int32 KillEnemyCount;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Enemy")
 	int32 AllEnemyCount;
 
-	// Àû ½ºÆù ¾ç
+	// ì  ìŠ¤í° ì–‘
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	int32 MinSpawnNum;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	int32 MaxSpawnNum;
 
-	// °ÔÀÓÀÌ ÀÏ½ÃÁ¤Áö »óÅÂÀÎÁö ¿©ºÎ
+	// ê²Œì„ì´ ì¼ì‹œì •ì§€ ìƒíƒœì¸ì§€ ì—¬ë¶€
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Time")
 	bool bIsPaused;
 
-	//ÀÏ½ÃÁ¤ÁöÃ¢
+	//ì¼ì‹œì •ì§€ì°½
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> PauseMenuWidgetClass;
 
-	//°ÔÀÓ Á¾·áÃ¢
+	//ì˜µì…˜ë©”ë‰´
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> OptionMenuWidgetClass;
+
+	//ê²Œì„ ì¢…ë£Œì°½
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> EndMenuWidgetClass;
 
-	// Á¶ÀÛ¹ı ¼³¸íÃ¢
+	// ì¡°ì‘ë²• ì„¤ëª…ì°½
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> MenualWidgetClass;
 
-	// Á¦ÇÑ ½Ã°£ Áö³µ´ÂÁö, ÇÃ·¹ÀÌ¾î »ç¸Á ¿©ºÎ
+	// ì œí•œ ì‹œê°„ ì§€ë‚¬ëŠ”ì§€, í”Œë ˆì´ì–´ ì‚¬ë§ ì—¬ë¶€
 	bool bIsTimesUp;
 	bool bIsPlayerDead;
-	
+
 
 	FTimerHandle GameTimerHandle;
 	FTimerHandle EnemyTimerHandle;
@@ -62,15 +66,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Menu")
 	void LocalStartGame();
 
-	// °ÔÀÓ ÀÏ½ÃÁ¤Áö Ã³¸®
+	// ê²Œì„ ì¼ì‹œì •ì§€ ì²˜ë¦¬
 	UFUNCTION(BlueprintCallable, Category = "GameFlow")
 	void LocalPauseGame();
 
-	// °ÔÀÓ Àç°³ Ã³¸®
+	// ê²Œì„ ì¬ê°œ ì²˜ë¦¬
 	UFUNCTION(BlueprintCallable, Category = "GameFlow")
 	void LocalResumeGame();
 
-	// °ÔÀÓ ¸®¼Â Ã³¸®
+	UFUNCTION(BlueprintCallable, Category = "GameFlow")
+	void LocalOptionMenu();
+	UFUNCTION(BlueprintCallable, Category = "GameFlow")
+	void CloseOptionMenu();
+
+	// ê²Œì„ ë¦¬ì…‹ ì²˜ë¦¬
 	UFUNCTION(BlueprintCallable, Category = "GameFlow")
 	void LocalResetGame();
 
@@ -89,28 +98,30 @@ public:
 	void SetDamage(int32 Damage);
 	void SetTakenDamage(int32 Damage);
 	void CheckTimesUp();
-	void KillEnemy(int32 Score);	// ÀûÀ» Á×¾úÀ»¶§
+	void KillEnemy(int32 Score);	// ì ì„ ì£½ì—ˆì„ë•Œ
 	void EnemySpawn();
 	void TimerUpdate();
 	void SetHUDVisibility(bool bVisible);
 	void SetingHUD();
 	void UpdateHUD();
-	void GameEnd(FString Result);	// °ÔÀÓ Á¾·á
+	void GameEnd(FString Result);	// ê²Œì„ ì¢…ë£Œ
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
+	UPROPERTY(BlueprintReadOnly)
+	UUserWidget* PauseMenuWidget;
+
 private:
 	bool bIsTimerRunning;
 	bool bIsGameEnded;
 	int32 WaveCount;
 	int32 RoundScore;
-	UUserWidget* PauseMenuWidget;
 	UUserWidget* EndMenuWidget;
 	UUserWidget* MenualWidget;
+	UUserWidget* OptionMenuWidget;
 
-	// HUD À§Á¬
+	// HUD ìœ„ì ¯
 	AHUD* HUDInstance;
 	TSubclassOf<UUserWidget> HUDWidgetClass;
 	UUserWidget* HUDWidget;

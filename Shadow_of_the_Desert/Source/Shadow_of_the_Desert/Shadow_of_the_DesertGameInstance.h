@@ -7,7 +7,7 @@
 #include "Shadow_of_the_DesertGameInstance.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class SHADOW_OF_THE_DESERT_API UShadow_of_the_DesertGameInstance : public UGameInstance
@@ -16,26 +16,33 @@ class SHADOW_OF_THE_DESERT_API UShadow_of_the_DesertGameInstance : public UGameI
 public:
 	UShadow_of_the_DesertGameInstance();
 
-	// ÃÑ Á¡¼ö
+	// ì´ ì ìˆ˜
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GameData")
 	int32 TotalScore;
-	// ÃÑ ÀÔÈù ÇÇÇØ·®
+	// ì´ ì…íŒ í”¼í•´ëŸ‰
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GameData")
 	float TotalDamageDealt;
-	// ÃÑ ÀÔÀº ÇÇÇØ·®
+	// ì´ ì…ì€ í”¼í•´ëŸ‰
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GameData")
 	float TotalDamageTaken;
 
 
-	// ÃÑ Á¡¼ö¸¦ Áõ°¡½ÃÅ°´Â ÇÔ¼ö
+	// ì´ ì ìˆ˜ë¥¼ ì¦ê°€ì‹œí‚¤ëŠ” í•¨ìˆ˜
 	UFUNCTION(BlueprintCallable, Category = "GameData")
 	void AddScore(int32 Score);
 
-	// ÃÑ ÀÔÈù ÇÇÇØ·®À» Áõ°¡½ÃÅ°´Â ÇÔ¼ö
+	// ì´ ì…íŒ í”¼í•´ëŸ‰ì„ ì¦ê°€ì‹œí‚¤ëŠ” í•¨ìˆ˜
 	UFUNCTION(BlueprintCallable, Category = "GameData")
 	void AddDamageDealt(float Damage);
 
-	// ÃÑ ÀÔÀº ÇÇÇØ·®À» Áõ°¡½ÃÅ°´Â ÇÔ¼ö
+	// ì´ ì…ì€ í”¼í•´ëŸ‰ì„ ì¦ê°€ì‹œí‚¤ëŠ” í•¨ìˆ˜
 	UFUNCTION(BlueprintCallable, Category = "GameData")
 	void AddDamageTaken(float Damage);
+
+	UFUNCTION(BlueprintCallable, Category = "GameData")
+
+	void SaveSensitivity(float InSensitivity);
+	UFUNCTION(BlueprintCallable, Category = "GameData")
+
+	float LoadSensitivity();
 };

@@ -151,6 +151,47 @@ void AShadow_of_the_DesertGameState::LocalResumeGame()
 	}
 }
 
+void AShadow_of_the_DesertGameState::LocalOptionMenu()
+{
+	if (OptionMenuWidgetClass && OptionMenuWidget == nullptr)
+	{
+		OptionMenuWidget = CreateWidget<UUserWidget>(GetWorld(), OptionMenuWidgetClass);
+		if (OptionMenuWidget)
+		{
+			// Pause Menu 제거
+			if (PauseMenuWidget)
+			{
+				PauseMenuWidget->RemoveFromParent();
+				PauseMenuWidget = nullptr;
+			}
+			SetHUDVisibility(false);
+
+			OptionMenuWidget->AddToViewport();
+
+			if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+			{
+				GetWorldTimerManager().PauseTimer(GameTimerHandle);
+
+				FInputModeUIOnly InputMode;
+				InputMode.SetWidgetToFocus(OptionMenuWidget->TakeWidget());
+				InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+				PC->bShowMouseCursor = true;
+				PC->SetInputMode(InputMode);
+			}
+		}
+	}
+}
+
+void AShadow_of_the_DesertGameState::CloseOptionMenu()
+{
+	if (OptionMenuWidget)
+	{
+		OptionMenuWidget->RemoveFromParent();
+		OptionMenuWidget = nullptr;
+	}
+}
+
+
 void AShadow_of_the_DesertGameState::SetHUDVisibility(bool bVisible)
 {
 	if (HUDWidget)

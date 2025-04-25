@@ -13,6 +13,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Shadow_of_the_DesertGameInstance.h"
 #include "Player_Controller.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -78,6 +79,11 @@ AShadow_of_the_DesertCharacter::AShadow_of_the_DesertCharacter()
 void AShadow_of_the_DesertCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (UShadow_of_the_DesertGameInstance* GI = Cast<UShadow_of_the_DesertGameInstance>(UGameplayStatics::GetGameInstance(this)))
+	{
+		MouseSensitivity = GI->LoadSensitivity();
+	}
 
 	// �⺻ ���� ����
 	if (RifleClass) // RifleClass�� �����Ǿ� �ִ� ���
@@ -189,8 +195,8 @@ void AShadow_of_the_DesertCharacter::Look(const FInputActionValue& Value)
 	if (Controller != nullptr)
 	{
 		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
+		AddControllerYawInput(LookAxisVector.X * MouseSensitivity);
+		AddControllerPitchInput(LookAxisVector.Y * MouseSensitivity);
 	}
 }
 
