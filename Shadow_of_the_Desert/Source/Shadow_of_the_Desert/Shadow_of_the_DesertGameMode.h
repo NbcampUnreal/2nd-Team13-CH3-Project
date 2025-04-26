@@ -15,17 +15,17 @@ public:
 
 	AShadow_of_the_DesertGameMode();
 
-	// ¸ÞÀÎ ¸Þ´º È£Ãâ
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½Þ´ï¿½ È£ï¿½ï¿½
 	UFUNCTION(BlueprintCallable, Category = "GameFlow")
 	void ShowMainMenu();
 
 	void CloseMainMenu();
 
-	void RestartGame(); // ÇÃ·¹ÀÌ¾î ¸®½ºÆù ÇÔ¼ö
+	void RestartGame(); // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
 protected:
 	virtual void BeginPlay() override;
 
-	// °ÔÀÓ½ÃÀÛ ¸ÞÀÎ ¸Þ´º
+	// ï¿½ï¿½ï¿½Ó½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ´ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
 	TSubclassOf<UUserWidget> MainMenuWidgetClass;
 

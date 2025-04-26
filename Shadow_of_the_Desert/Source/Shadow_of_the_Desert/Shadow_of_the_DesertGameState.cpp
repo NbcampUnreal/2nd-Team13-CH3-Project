@@ -156,14 +156,20 @@ void AShadow_of_the_DesertGameState::LocalOptionMenu()
 	if (OptionMenuWidgetClass && OptionMenuWidget == nullptr)
 	{
 		OptionMenuWidget = CreateWidget<UUserWidget>(GetWorld(), OptionMenuWidgetClass);
+		MainMenuWidget = CreateWidget<UUserWidget>(GetWorld(), MainMenuWidgetClass);
 		if (OptionMenuWidget)
 		{
-			// Pause Menu 제거
 			if (PauseMenuWidget)
 			{
 				PauseMenuWidget->RemoveFromParent();
 				PauseMenuWidget = nullptr;
 			}
+			if (MainMenuWidget)
+			{
+				MainMenuWidget->RemoveFromParent();
+				MainMenuWidget = nullptr;
+			}
+
 			SetHUDVisibility(false);
 
 			OptionMenuWidget->AddToViewport();

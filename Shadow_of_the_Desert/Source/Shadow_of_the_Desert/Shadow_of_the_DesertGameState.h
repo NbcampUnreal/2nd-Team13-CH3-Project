@@ -35,6 +35,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Time")
 	bool bIsPaused;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> MainMenuWidgetClass;
+
 	//일시정지창
 	UPROPERTY(EditAnywhere, Category = "UI")
 	TSubclassOf<UUserWidget> PauseMenuWidgetClass;
@@ -120,6 +123,7 @@ private:
 	UUserWidget* EndMenuWidget;
 	UUserWidget* MenualWidget;
 	UUserWidget* OptionMenuWidget;
+	UUserWidget* MainMenuWidget;
 
 	// HUD 위젯
 	AHUD* HUDInstance;
